@@ -1,23 +1,31 @@
-package T2F2.SPOT.domain.wish.entity;
+package T2F2.SPOT.domain.review.entity;
 
 import T2F2.SPOT.domain.post.entity.Post;
-import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.user.entity.User;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
-public class Wish {
+public class Review {
 
     @Id
     @GeneratedValue
-    @Column(name = "wish_id")
+    @Column(name = "review_id")
     private Long id;
+
+
+    private float rate;
+
+    @Nullable
+    private String message;
+
+    // 생성 일자
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 }
