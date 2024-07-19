@@ -9,8 +9,8 @@ import jakarta.persistence.*;
 public class Review {
 
     @Id
-    @GeneratedValue
     @Column(name = "review_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 

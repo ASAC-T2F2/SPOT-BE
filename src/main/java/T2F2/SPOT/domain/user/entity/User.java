@@ -6,6 +6,7 @@ import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.wish.entity.Wish;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class User {
 
     @Id
     @Column(name = "user_id")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String user_email;

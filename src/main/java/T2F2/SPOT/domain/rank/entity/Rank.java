@@ -11,8 +11,8 @@ import java.util.List;
 public class Rank {
 
     @Id
-    @GeneratedValue
     @Column(name = "rank_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String rank_name;

@@ -4,6 +4,7 @@ import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import jakarta.persistence.*;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,8 @@ import java.util.List;
 public class NoteRoom {
 
     @Id
-    @GeneratedValue
     @Column(name = "note_room_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "note")

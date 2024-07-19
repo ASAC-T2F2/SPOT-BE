@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 public class Note {
 
     @Id
-    @GeneratedValue
     @Column(name = "note_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String note_content;

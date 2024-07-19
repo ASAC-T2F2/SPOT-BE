@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 @Entity
 public class Post_Image {
     @Id
-    @GeneratedValue
     @Column(name = "post_image_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -9,8 +9,8 @@ import jakarta.persistence.*;
 public class Wish {
 
     @Id
-    @GeneratedValue
     @Column(name = "wish_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
