@@ -1,5 +1,7 @@
 package T2F2.SPOT.domain.user.entity;
 
+import T2F2.SPOT.domain.note.entity.Note;
+import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.review.entity.Review;
@@ -29,7 +31,7 @@ public class User {
     // 생성 일자
     // 탈퇴 일자
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rank")
+    @JoinColumn(name = "rank_id")
     private Rank rank;
 
     @OneToMany(mappedBy = "wish")
@@ -40,4 +42,11 @@ public class User {
 
     @OneToMany(mappedBy = "post")
     private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "note")
+    private List<Note> notes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "note_room")
+    private List<NoteRoom> noteRooms = new ArrayList<>();
 }
+

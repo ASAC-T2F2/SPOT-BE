@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.post.entity;
 
 import T2F2.SPOT.domain.category.entity.Category;
+import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.user.entity.User;
@@ -41,7 +42,7 @@ public class Post {
     @OneToMany(mappedBy = "post_image")
     private List<Post_Image> postImages = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne(mappedBy = "review")
@@ -49,4 +50,7 @@ public class Post {
 
     @OneToMany(mappedBy = "wish")
     private List<Wish> wishes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "note_room")
+    private List<NoteRoom> noteRooms = new ArrayList<>();
 }

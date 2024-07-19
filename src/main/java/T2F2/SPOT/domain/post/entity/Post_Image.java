@@ -10,7 +10,7 @@ public class Post_Image {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post")
+    @JoinColumn(name = "post_id")
     private Post post;
 
     private String image_url;
