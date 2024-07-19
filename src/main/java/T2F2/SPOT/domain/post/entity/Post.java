@@ -2,7 +2,8 @@ package T2F2.SPOT.domain.post.entity;
 
 import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
-import T2F2.SPOT.domain.rank.entity.Rank;
+import T2F2.SPOT.domain.post.PostFor;
+import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.wish.entity.Wish;
@@ -24,13 +25,9 @@ public class Post extends BaseEntity {
 
     private String post_content;
 
+    private PostFor postFor;
 
-    // ENUM 생성해야 함
-    // 게시물 목적
-    // 게시물 상태
-
-    // 등록일
-    // 수정일
+    private PostStatus postStatus;
 
     private String price;
 
@@ -41,7 +38,7 @@ public class Post extends BaseEntity {
     private Category category;
 
     @OneToMany(mappedBy = "post_image")
-    private List<Post_Image> postImages = new ArrayList<>();
+    private List<PostImage> postImages = new ArrayList<>();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
