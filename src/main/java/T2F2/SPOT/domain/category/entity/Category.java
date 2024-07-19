@@ -18,6 +18,6 @@ public class Category extends BaseEntity {
 
     private String category_name;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "category")
     private List<Post> posts = new ArrayList<>();
 }

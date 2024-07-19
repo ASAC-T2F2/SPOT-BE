@@ -18,7 +18,7 @@ public class NoteRoom extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "note")
+    @OneToMany(mappedBy = "noteRoom")
     private List<Note> notes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

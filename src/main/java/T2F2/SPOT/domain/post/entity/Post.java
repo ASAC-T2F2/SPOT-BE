@@ -37,18 +37,19 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "post_image")
+    @OneToMany(mappedBy = "post")
     private List<PostImage> postImages = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(mappedBy = "review")
+    @OneToOne(mappedBy = "post")
     private Review review;
 
-    @OneToMany(mappedBy = "wish")
+    @OneToMany(mappedBy = "post")
     private List<Wish> wishes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "note_room")
+    @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 }

@@ -36,19 +36,19 @@ public class User extends BaseEntity {
     @JoinColumn(name = "rank_id")
     private Rank rank;
 
-    @OneToMany(mappedBy = "wish")
+    @OneToMany(mappedBy = "user")
     private List<Wish> wishes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "review")
+    @OneToMany(mappedBy = "user")
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "user")
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "note")
+    @OneToMany(mappedBy = "user")
     private List<Note> notes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "note_room")
+    @OneToMany(mappedBy = "user")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 }
 

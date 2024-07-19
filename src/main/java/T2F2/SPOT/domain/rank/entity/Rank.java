@@ -19,6 +19,6 @@ public class Rank extends BaseEntity {
     private String rank_name;
 
     private String rank_image_url;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "rank")
     private List<User> users = new ArrayList<>();
 }
