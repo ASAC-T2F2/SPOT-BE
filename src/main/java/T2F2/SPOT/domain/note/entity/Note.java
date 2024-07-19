@@ -1,10 +1,11 @@
 package T2F2.SPOT.domain.note.entity;
 
 import T2F2.SPOT.domain.user.entity.User;
+import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
-public class Note {
+public class Note extends BaseEntity {
 
     @Id
     @Column(name = "note_id")

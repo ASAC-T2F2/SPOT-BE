@@ -6,13 +6,14 @@ import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.wish.entity.Wish;
+import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Post {
+public class Post extends BaseEntity {
 
     @Id
     @Column(name = "post_id")

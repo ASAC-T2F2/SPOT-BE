@@ -2,11 +2,12 @@ package T2F2.SPOT.domain.review.entity;
 
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.user.entity.User;
+import T2F2.SPOT.util.BaseEntity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 @Entity
-public class Review {
+public class Review extends BaseEntity {
 
     @Id
     @Column(name = "review_id")
