@@ -16,9 +16,9 @@ public class Rank extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String rank_name;
+    private String rankName;
 
-    private String rank_image_url;
+    private String rankImageUrl;
     @OneToMany(mappedBy = "rank")
     private List<User> users = new ArrayList<>();
 }

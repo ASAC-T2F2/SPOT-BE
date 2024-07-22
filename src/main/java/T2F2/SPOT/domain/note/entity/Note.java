@@ -12,7 +12,7 @@ public class Note extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String note_content;
+    private String noteContent;
 
     // 작성일
     // 삭제일

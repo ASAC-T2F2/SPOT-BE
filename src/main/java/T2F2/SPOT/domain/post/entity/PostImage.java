@@ -14,5 +14,5 @@ public class PostImage extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private String image_url;
+    private String imageUrl;
 }

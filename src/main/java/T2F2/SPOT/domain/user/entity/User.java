@@ -21,14 +21,14 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String user_email;
-    private String user_password;
-    private String user_nickname;
-    private String user_university;
-    private String user_major;
-    private String entrace_year;
-    private Boolean is_deleted;
-    private String image_url;
+    private String userEmail;
+    private String userPassword;
+    private String userNickname;
+    private String userUniversity;
+    private String userMajor;
+    private String entranceYear;
+    private Boolean isDeleted;
+    private String imageUrl;
 
     // 생성 일자
     // 탈퇴 일자

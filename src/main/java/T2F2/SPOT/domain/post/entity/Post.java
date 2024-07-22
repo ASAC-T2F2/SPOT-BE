@@ -21,9 +21,9 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String post_title;
+    private String postTitle;
 
-    private String post_content;
+    private String postContent;
 
     private PostFor postFor;
 
@@ -31,7 +31,7 @@ public class Post extends BaseEntity {
 
     private String price;
 
-    private Boolean is_deleted;
+    private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
