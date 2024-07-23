@@ -1,7 +1,6 @@
 package T2F2.SPOT.domain.rank.entity;
 
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 
@@ -19,6 +18,7 @@ public class Rank extends BaseEntity {
     private String rankName;
 
     private String rankImageUrl;
+
     @OneToMany(mappedBy = "rank")
     private List<User> users = new ArrayList<>();
 }

@@ -25,8 +25,10 @@ public class Post extends BaseEntity {
 
     private String postContent;
 
+    @Enumerated(EnumType.STRING)
     private PostFor postFor;
 
+    @Enumerated(EnumType.STRING)
     private PostStatus postStatus;
 
     private String price;
@@ -37,17 +39,18 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostImage> postImages = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(mappedBy = "post")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "review_id")
     private Review review;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Wish> wishes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")

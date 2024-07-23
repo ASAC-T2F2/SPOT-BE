@@ -7,7 +7,6 @@ import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -21,11 +20,11 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userEmail;
-    private String userPassword;
-    private String userNickname;
-    private String userUniversity;
-    private String userMajor;
+    private String email;
+    private String password;
+    private String nickname;
+    private String university;
+    private String major;
     private String entranceYear;
     private Boolean isDeleted;
     private String imageUrl;
@@ -36,13 +35,13 @@ public class User extends BaseEntity {
     @JoinColumn(name = "rank_id")
     private Rank rank;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Wish> wishes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")

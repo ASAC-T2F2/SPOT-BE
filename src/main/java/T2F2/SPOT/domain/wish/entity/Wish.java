@@ -1,7 +1,6 @@
 package T2F2.SPOT.domain.wish.entity;
 
 import T2F2.SPOT.domain.post.entity.Post;
-import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;

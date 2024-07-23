@@ -14,7 +14,6 @@ public class Review extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     private float rate;
 
     @Nullable
@@ -26,7 +25,6 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @OneToOne(mappedBy = "review", fetch = FetchType.LAZY)
     private Post post;
 }
