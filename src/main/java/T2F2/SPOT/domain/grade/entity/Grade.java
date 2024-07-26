@@ -1,4 +1,4 @@
-package T2F2.SPOT.domain.rank.entity;
+package T2F2.SPOT.domain.grade.entity;
 
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.util.BaseEntity;
@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Rank extends BaseEntity {
+public class Grade extends BaseEntity {
 
     @Id
-    @Column(name = "rank_id")
+    @Column(name = "grade_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -19,6 +19,6 @@ public class Rank extends BaseEntity {
 
     private String rankImageUrl;
 
-    @OneToMany(mappedBy = "rank")
+    @OneToMany(mappedBy = "grade")
     private List<User> users = new ArrayList<>();
 }
