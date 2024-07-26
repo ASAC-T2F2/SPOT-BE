@@ -1,9 +1,9 @@
 package T2F2.SPOT.domain.user.entity;
 
+import T2F2.SPOT.domain.grade.entity.Grade;
 import T2F2.SPOT.domain.note.entity.Note;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.entity.Post;
-import T2F2.SPOT.domain.rank.entity.Rank;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
@@ -32,8 +32,8 @@ public class User extends BaseEntity {
     // 생성 일자
     // 탈퇴 일자
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rank_id")
-    private Rank rank;
+    @JoinColumn(name = "grade_id")
+    private Grade grade;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Wish> wishes = new ArrayList<>();
