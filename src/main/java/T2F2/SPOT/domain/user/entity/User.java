@@ -8,11 +8,13 @@ import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 public class User extends BaseEntity {
 
     @Id
