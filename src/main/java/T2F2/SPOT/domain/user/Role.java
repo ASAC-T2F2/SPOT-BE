@@ -1,8 +1,8 @@
 package T2F2.SPOT.domain.user;
 
 public enum Role {
-    ADMIN("관리자"),
-    USER("일반사용자");
+    ROLE_ADMIN("관리자"),
+    ROLE_USER("일반사용자");
 
     private String label;
 
