@@ -5,6 +5,7 @@ import T2F2.SPOT.domain.note.entity.Note;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.review.entity.Review;
+import T2F2.SPOT.domain.user.Role;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
@@ -28,6 +29,9 @@ public class User extends BaseEntity {
     private String entranceYear;
     private Boolean isDeleted;
     private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     // 생성 일자
     // 탈퇴 일자
