@@ -9,11 +9,17 @@ import T2F2.SPOT.domain.user.Role;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
     @Id
