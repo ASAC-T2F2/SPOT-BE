@@ -25,19 +25,31 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * 사용자 아이디와 비밀번호를 받아 인증
+     * @param request
+     * @param response
+     * @return 안중굙허
+     * @throws AuthenticationException
+     */
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         String username = obtainUsername(request);
         String password = obtainPassword(request);
 
-        System.out.println(username);
-
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
 
         return authenticationManager.authenticate(authToken);
     }
 
+    /**
+     * 인증 성공 시
+     * @param request
+     * @param response
+     * @param chain
+     * @param authentication
+     */
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
 
@@ -57,6 +69,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.addHeader("Authorization", "Bearer " + token);
     }
 
+    /**
+     * 인증 실패 시
+     * @param request
+     * @param response
+     * @param failed
+     */
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
 
