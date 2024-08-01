@@ -1,5 +1,6 @@
 package T2F2.SPOT.config;
 
+import T2F2.SPOT.domain.user.jwt.JWTFilter;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
 import T2F2.SPOT.domain.user.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
@@ -58,6 +59,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
