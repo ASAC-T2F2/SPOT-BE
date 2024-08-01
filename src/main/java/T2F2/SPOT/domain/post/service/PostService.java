@@ -27,7 +27,6 @@ public class PostService {
     public void createPost(CreatePostDto createPostDto) {
         User findUser = userRepository.findById(createPostDto.getUserId()).orElseThrow();
         Post result = postRepository.save(Post.of(createPostDto, findUser));
-
     }
 
     @Transactional(readOnly = true)
@@ -46,6 +45,7 @@ public class PostService {
         return responsePostDto.of(reuslt);
     }
 
+
     public void updateStatus(Long id, String status) {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
@@ -61,8 +61,6 @@ public class PostService {
         {
             throw new RuntimeException("이미 삭제된 게시글");
         }
-
         findPost.modifyPost(modifyPostDto);
-
     }
 }

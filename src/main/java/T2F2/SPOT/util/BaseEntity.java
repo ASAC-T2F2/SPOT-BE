@@ -23,5 +23,4 @@ public class BaseEntity {
     @Column(nullable = false)
     private LocalDateTime lastModifiedDate;
 
-
 }
