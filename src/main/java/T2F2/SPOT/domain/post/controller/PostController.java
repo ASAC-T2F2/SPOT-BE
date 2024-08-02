@@ -6,6 +6,7 @@ import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.CreatePostDto;
 import T2F2.SPOT.domain.post.dto.ModifyPostDto;
+import T2F2.SPOT.domain.post.dto.QPostDto;
 import T2F2.SPOT.domain.post.dto.responsePostDto;
 import T2F2.SPOT.domain.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -40,16 +41,19 @@ public class PostController {
     }
 
     @GetMapping("api/posts")
-    public Slice<responsePostDto> getSearchAndFilterAndSortPosts(
+    public Slice<QPostDto> getSearchAndFilterAndSortPosts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) PostStatus postStatus,
             @RequestParam(required = false) PostFor postFor,
             @RequestParam(defaultValue = "0") String minPrice,
             @RequestParam(defaultValue = "1000000") String maxPrice,
-            @RequestParam(required = false) SortBy sortBy
+            @RequestParam(required = false) SortBy sortBy,
+            @RequestParam(defaultValue = "0") int startIndex
             ) {
 
+
+        return postService.getSearchFilterList(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy, startIndex);
     }
 
     @PutMapping("api/post/updateStatus/{id}/{status}")
