@@ -15,6 +15,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static T2F2.SPOT.domain.post.PostQueryHelper.createFilterBuilder;
@@ -39,9 +40,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .selectFrom(post)
                 .where(condition)
                 .orderBy(getOrderSpecifier(searchPostConditionDto.getSortBy(), post))
-                .limit(10)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch()
-                .stream().toList();
+                .stream()
+                .map(post -> post.getIsDeleted() ? null : post)
+                .filter(Objects::nonNull)
+                .toList();
 
         List<QPostDto> content = posts.stream().map(QPostDto::of).toList();
         return new PageImpl<>(content);
