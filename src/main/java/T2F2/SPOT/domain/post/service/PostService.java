@@ -48,8 +48,12 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public responsePostDto findPostById(Long id) {
-        Post reuslt = postRepository.findById(id).orElseThrow();
-        return responsePostDto.of(reuslt);
+        Post findPost = postRepository.findById(id).orElseThrow();
+        if(findPost.getIsDeleted())
+        {
+            throw new RuntimeException("이미 삭제된 게시글");
+        }
+        return responsePostDto.of(findPost);
     }
 
     @Transactional(readOnly = true)
@@ -63,10 +67,10 @@ public class PostService {
             SortBy sortBy,
             int startIndex
             ) {
-        Pageable pageable = PageRequest.of(startIndex, 10);
+        Pageable pageable = PageRequest.of(startIndex, 3);
         SearchPostConditionDto condition = SearchPostConditionDto.of(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy);
-        log.info("Keyword : {}, Category : {}, PostFor : {}, PostStatus : {}, price : {} ~ {}, Sort : {} ", condition.getKeyword(), condition.getCategory(),
-                condition.getPostFor(), condition.getPostStatus(), condition.getMinPrice(), condition.getMaxPrice(), condition.getSortBy()
+        log.info("Keyword : {}, Category : {}, PostFor : {}, PostStatus : {}, price : {} ~ {}, Sort : {}, StartIndex : {} ", condition.getKeyword(), condition.getCategory(),
+                condition.getPostFor(), condition.getPostStatus(), condition.getMinPrice(), condition.getMaxPrice(), condition.getSortBy(), startIndex
         );
         return postRepository.searchPosts(
                 pageable,
