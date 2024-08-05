@@ -14,6 +14,30 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
+  # Email
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail_id}
+    password: ${mail_password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+#    auth-code-expiration-millis: 300000  # 5 * 60 * 1000 == 5분?
+
+# # Redis
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+
 logging:
   level:
     org.hibernate.SQL: debug
