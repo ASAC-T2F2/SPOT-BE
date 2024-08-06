@@ -2,8 +2,10 @@ package T2F2.SPOT.domain.user.jwt;
 
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.Collection;
 import java.util.Iterator;
 
+@Slf4j
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -29,7 +32,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
      * 사용자 아이디와 비밀번호를 받아 인증
      * @param request
      * @param response
-     * @return 안중굙허
+     * @return 인증
      * @throws AuthenticationException
      */
     @Override
@@ -37,6 +40,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String username = obtainUsername(request);
         String password = obtainPassword(request);
+
+        log.info("Attempting to authenticate user: {}", username);
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
 
@@ -53,20 +58,26 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        String username = customUserDetails.getUsername();
+        // 유저 정보
+        String username = authentication.getName();
+        log.info("Successfully authenticated user: {}", username);
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
+        Iterator<? extends GrantedAuthority> authoritiesIterator = authorities.iterator();
+        GrantedAuthority authority = authoritiesIterator.next();
+        String role = authority.getAuthority();
+        log.info("{} has role: {}", username, role);
 
-        String role = auth.getAuthority();
+        // 토큰 생성
+        String accessToken = jwtUtil.createJwt("access", username, role, 600000L);
+        String refreshToken = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
+        log.info("LoginFilter AccessToken: {}", accessToken);
+        log.info("LoginFilter RefreshToken: {}", refreshToken);
 
-        String token = jwtUtil.createJwt(username, role, 60*60*10L);
-
-        response.addHeader("Authorization", "Bearer " + token);
+        // 응답 설정
+        response.setHeader("access", accessToken);
+        response.addCookie(createCookie("refresh", refreshToken));
     }
 
     /**
@@ -78,6 +89,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
 
+        log.debug("Unsuccessful authentication");
         response.setStatus(401);
+    }
+
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24*64*80);
+
+        // https 적용 시 활성화
+        //cookie.setSecure(true);
+
+        // 쿠키 적용 범위 설정 가능
+        // cookie.setPath("/");
+
+        // JS 접근 차단
+        cookie.setHttpOnly(true);
+
+        return cookie;
+
     }
 }

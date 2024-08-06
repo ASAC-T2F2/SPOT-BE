@@ -1,12 +1,14 @@
 package T2F2.SPOT.domain.user.dto;
 
 import T2F2.SPOT.domain.user.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+@Slf4j
 public class CustomUserDetails implements UserDetails {
     private final User user;
 
@@ -25,8 +27,9 @@ public class CustomUserDetails implements UserDetails {
 
             @Override
             public String getAuthority() {
-
-                return user.getRole().toString();
+                String role = user.getRole().toString();
+                log.debug("Role: {}", role);
+                return role;
             }
         });
 

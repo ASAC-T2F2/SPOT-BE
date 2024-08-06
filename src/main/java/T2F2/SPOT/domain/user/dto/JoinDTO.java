@@ -31,7 +31,7 @@ public class JoinDTO {
                 .entranceYear(joinDTO.getEntranceYear())
                 .imageUrl(joinDTO.getImageUrl())
                 .isDeleted(false)
-                .role(Role.ROLE_USER)
+                .role(Role.USER)
                 .build();
     }
 }

@@ -2,14 +2,15 @@ package T2F2.SPOT.domain.user.service;
 
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
@@ -20,20 +21,22 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     /**
      * Email 기반으로 UserDetails 획득
-     * @param email
+     * @param username
      * @return
      * @throws UsernameNotFoundException
      */
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = userRepository.findByEmail(email);
+        User userData = userRepository.findByEmail(username);
 
-        if (user == null) {
-            throw new UserExceptions.UserNotFoundException("Username " + email + " not found");
+        if (userData != null) {
+            log.info("User found with username: {}", username);
+            return new CustomUserDetails(userData);
         }
 
-        // AuthenticationManager가 검증할 수 있도록 UserDetails에 담아서 반환
-        return new CustomUserDetails(user);
+        log.info("LoadUserByUsername: {} not found", username);
+
+        return null;
     }
 }

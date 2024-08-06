@@ -37,6 +37,7 @@ public class User extends BaseEntity {
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     private Role role;
 
     // 생성 일자
