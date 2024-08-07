@@ -3,6 +3,7 @@ package T2F2.SPOT.domain.user.jwt;
 import T2F2.SPOT.domain.user.Role;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.entity.User;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {
@@ -28,59 +30,60 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        //request에서 Authorization 헤더를 찾음
-        String authorization= request.getHeader("Authorization");
-        log.info("JWT Token 1: {}", authorization);
+        // 프론트 측에서 보낸 요청의 헤더에서 access 키에 담긴 토큰 추출
+        String accessToken = request.getHeader("access");
+        log.info("Access token: {}", accessToken);
 
-        //Authorization 헤더 검증
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-
-            log.info("Token null");
+        // 토큰이 없는 경우 처리 (다음 필터로 이동)
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        } else {
             filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
-        String token = authorization.split(" ")[1];
-        log.info("JWT Token 2: {}", token);
+        // 토큰 만료 여부 확인, 만료 시 다음 필터로 넘기지 않는다.
+        try {
+            jwtUtil.isExpired(accessToken);
+        } catch (ExpiredJwtException e) {
 
-        //토큰 소멸 시간 검증
-        if (jwtUtil.isExpired(token)) {
+            // response status code : 프론트와 협의 된 코드
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
+            // response body : 프론트와 협의 된 응답 메시지
+            PrintWriter writer = response.getWriter();
+            writer.println("access token expired");
+            writer.close();
 
-            //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
+        // 토큰 카테고리 확인 (발급 시 페이로드에 명시)
+        String category = jwtUtil.getCategory(accessToken);
 
-        String username = jwtUtil.getUsername(token);
-        String role = String.valueOf(jwtUtil.getRole(token));
-        log.info("username {}", username);
-        log.info("role {}", role);
+        if (!category.equals("access")) {
+
+            // response body : 프론트와 협의 된 코드
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            // response body : 프론트와 협의 된 응답 메시지
+            PrintWriter writer = response.getWriter();
+            writer.println("token's category is not access: " + category);
+            writer.close();
+
+            return;
+        }
+
+        // username, role 값 획득
+        String username = jwtUtil.getUsername(accessToken);
+        Role role = Role.valueOf(jwtUtil.getRole(accessToken));
 
         User user = new User();
         user.setEmail(username);
-        user.setPassword("temppassword");
+        user.setRole(role);
+        CustomUserDetails cussUserDetails = new CustomUserDetails(user);
 
-        // Role 열거형 값 처리
-        Role userRole;
-        try {
-            userRole = Role.valueOf(role);
-            log.info("[doFilterInternal] userRole {}", userRole);
-        } catch (IllegalArgumentException e) {
-            // 열거형 값이 적절하지 않은 경우 기본값으로 설정하거나 예외 처리
-            userRole = Role.USER; // 예를 들어, 기본값 설정
-            // 로깅 등 필요한 예외 처리 로직 추가 가능
-        }
-        user.setRole(userRole);
-
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-
+        Authentication authToken = new UsernamePasswordAuthenticationToken(cussUserDetails, null, cussUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
