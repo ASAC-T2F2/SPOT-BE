@@ -8,10 +8,15 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -23,6 +28,23 @@ public class TokenService {
     public TokenService(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+    }
+
+
+    @Transactional
+    @Scheduled(cron = "0 0 4 * * ?")
+    public void cleanUpExpiredTokens() {
+        Instant deadline = Instant.now().minus(1, ChronoUnit.HOURS);
+        Date oneHourAgo = Date.from(deadline);
+
+        List<RefreshToken> expiredRefreshTokens = refreshTokenRepository.findByExpirationBefore(String.valueOf(oneHourAgo));
+
+        if (!expiredRefreshTokens.isEmpty()) {
+            refreshTokenRepository.deleteAll(expiredRefreshTokens);
+            log.info("Deleted {} expired refresh tokens", expiredRefreshTokens.size());
+        } else {
+            log.info("No expired refresh tokens found");
+        }
     }
 
     /**
