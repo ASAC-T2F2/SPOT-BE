@@ -49,10 +49,13 @@ public class TokenService {
 
         // 새로운 JWT 생성
         String newAccess = jwtUtil.createJwt("access", username, role, 600000L);
+        String newRefresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
         log.info("[Reissue Service] - newAccess: {}", newAccess);
+        log.info("[Reissue Service] - newRefresh: {}", newRefresh);
 
         // response
         response.setHeader("access", newAccess);
+        response.addCookie(createCookie("refresh", newRefresh));
 
         // 토큰을 굳이 보낼 이유는 없다. 후에 고민
         return newAccess;
@@ -70,5 +73,22 @@ public class TokenService {
             }
         }
         return null;
+    }
+
+    /**
+     * 쿠키 생성
+     * @param key
+     * @param value
+     * @return 생성된 쿠키
+     */
+    private Cookie createCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24*60*60);
+        cookie.setHttpOnly(true);
+
+//        cookie.setSecure(true);
+//        cookie.setPath("/");
+
+        return cookie;
     }
 }
