@@ -1,7 +1,9 @@
 package T2F2.SPOT.domain.user.service;
 
+import T2F2.SPOT.domain.user.entity.RefreshToken;
 import T2F2.SPOT.domain.user.exception.TokenException;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
+import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,14 +11,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @Slf4j
 public class TokenService {
 
     private final JWTUtil jwtUtil;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public TokenService(JWTUtil jwtUtil) {
+    public TokenService(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
         this.jwtUtil = jwtUtil;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     /**
@@ -42,6 +48,18 @@ public class TokenService {
             throw new TokenException.RefreshTokenExpiredException("Refresh token is expired");
         }
 
+        // 토큰 카테고리 확인
+        String category = jwtUtil.getCategory(refresh);
+        if (!category.equals("refresh")) {
+            throw new TokenException.InvalidTokenCategory("Token's category is not refresh: " + category);
+        }
+
+        // DB에 저장되어 있는 지 확인
+        Boolean refreshTokenExist = refreshTokenRepository.existsByRefreshToken(refresh);
+        if (!refreshTokenExist) {
+            throw new TokenException.InvalidRefreshToken("Invalid Refresh Token");
+        }
+
         String username = jwtUtil.getUsername(refresh);
         String role = String.valueOf(jwtUtil.getRole(refresh));
 
@@ -53,12 +71,34 @@ public class TokenService {
         log.info("[Reissue Service] - newAccess: {}", newAccess);
         log.info("[Reissue Service] - newRefresh: {}", newRefresh);
 
+        // Refresh 토큰 교체
+        refreshTokenRepository.deleteByRefreshToken(refresh);
+        addRefreshToken(username, newRefresh, 86400000L);
+
         // response
         response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
 
         // 토큰을 굳이 보낼 이유는 없다. 후에 고민
         return newAccess;
+    }
+
+    /**
+     * Refresh 토큰 교체
+     * @param username
+     * @param newRefresh
+     * @param expiredMs
+     */
+    private void addRefreshToken(String username, String newRefresh, Long expiredMs) {
+
+        Date expirationDate = new Date(System.currentTimeMillis() + expiredMs);
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUsername(username);
+        refreshToken.setRefreshToken(newRefresh);
+        refreshToken.setExpiration(expirationDate.toString());
+
+        refreshTokenRepository.save(refreshToken);
     }
 
     /**

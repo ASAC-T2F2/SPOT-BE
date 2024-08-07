@@ -3,6 +3,7 @@ package T2F2.SPOT.config;
 import T2F2.SPOT.domain.user.jwt.JWTFilter;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
 import T2F2.SPOT.domain.user.jwt.LoginFilter;
+import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,12 +23,14 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository) {
 
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Bean
@@ -68,7 +71,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
 
         //세션 설정
         http

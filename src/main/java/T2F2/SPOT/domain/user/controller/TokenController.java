@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.user.controller;
 
 import T2F2.SPOT.domain.user.exception.TokenException;
+import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
 import T2F2.SPOT.domain.user.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +29,7 @@ public class TokenController {
         try {
             String newAccessToken = tokenService.reissueToken(request, response);
             return new ResponseEntity<>(newAccessToken, HttpStatus.OK);
-        } catch (TokenException.RefreshTokenIsNullException | TokenException.RefreshTokenExpiredException e) {
+        } catch (TokenException.RefreshTokenIsNullException | TokenException.RefreshTokenExpiredException | TokenException.InvalidTokenCategory | TokenException.InvalidRefreshToken e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

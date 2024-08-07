@@ -2,12 +2,15 @@ package T2F2.SPOT.domain.user.jwt;
 
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.dto.LoginRequest;
+import T2F2.SPOT.domain.user.entity.RefreshToken;
+import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 @Slf4j
@@ -25,12 +29,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, ObjectMapper objectMapper) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository) {
 
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     /**
@@ -86,12 +92,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String accessToken = jwtUtil.createJwt("access", username, role, 600000L);
         String refreshToken = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
-        log.info("LoginFilter AccessToken: {}", accessToken);
-        log.info("LoginFilter RefreshToken: {}", refreshToken);
+        // Refresh 토큰 저장
+        addRefreshToken(username, refreshToken, 86400000L);
+
+        log.info("[LoginFilter] - AccessToken: {}", accessToken);
+        log.info("[LoginFilter] - RefreshToken: {}", refreshToken);
 
         // 응답 설정
         response.setHeader("access", accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
+        response.setStatus(HttpStatus.OK.value());
     }
 
     /**
@@ -122,5 +132,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         return cookie;
 
+    }
+
+    private void addRefreshToken(String username, String refreshToken, Long expiredMs) {
+
+        Date expiration = new Date(System.currentTimeMillis() + expiredMs);
+
+        RefreshToken refresh = new RefreshToken();
+        refresh.setUsername(username);
+        refresh.setRefreshToken(refreshToken);
+        refresh.setExpiration(expiration.toString());
+
+        refreshTokenRepository.save(refresh);
     }
 }
