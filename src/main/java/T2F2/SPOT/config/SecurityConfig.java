@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/", "/auth/join", "/email/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/token/reissue").permitAll()
+                        .requestMatchers("/wish/add").permitAll()
                         .anyRequest().authenticated());
 
         http
