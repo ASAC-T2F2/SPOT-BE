@@ -4,6 +4,7 @@ import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.dto.LoginRequest;
 import T2F2.SPOT.domain.user.entity.RefreshToken;
 import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
+import T2F2.SPOT.domain.user.service.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
@@ -16,6 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -30,13 +33,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserDetailsService userDetailsService;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository, UserDetailsService userDetailsService) {
 
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userDetailsService = userDetailsService;
     }
 
     /**
@@ -76,29 +81,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
      * @param authentication
      */
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
+        CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(authentication.getName());
 
-        // 유저 정보
-        String username = authentication.getName();
-        log.info("Successfully authenticated user: {}", username);
+        log.info("Successfully authenticated user: {}", userDetails.getUsername());
 
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         Iterator<? extends GrantedAuthority> authoritiesIterator = authorities.iterator();
         GrantedAuthority authority = authoritiesIterator.next();
         String role = authority.getAuthority();
-        log.info("{} has role: {}", username, role);
+        log.info("{} has role: {}", userDetails.getUsername(), role);
 
-        // 토큰 생성
-        String accessToken = jwtUtil.createJwt("access", username, role, 600000L);
-        String refreshToken = jwtUtil.createJwt("refresh", username, role, 86400000L);
+        String accessToken = jwtUtil.createJwt("access", userDetails.getUsername(), role, 600000L);
+        String refreshToken = jwtUtil.createJwt("refresh", userDetails.getUsername(), role, 86400000L);
 
-        // Refresh 토큰 저장
-        addRefreshToken(username, refreshToken, 86400000L);
+        addRefreshToken(userDetails.getUsername(), refreshToken, 86400000L);
 
         log.info("[LoginFilter] - AccessToken: {}", accessToken);
         log.info("[LoginFilter] - RefreshToken: {}", refreshToken);
 
-        // 응답 설정
         response.setHeader("access", accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
         response.setStatus(HttpStatus.OK.value());
