@@ -21,12 +21,10 @@ import java.io.PrintWriter;
 @Slf4j
 public class JWTFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
-    private final UserRepository userRepository;
 
-    public JWTFilter(JWTUtil jwtUtil, UserRepository userRepository) {
+    public JWTFilter(JWTUtil jwtUtil) {
 
         this.jwtUtil = jwtUtil;
-        this.userRepository = userRepository;
     }
 
 
@@ -35,7 +33,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 프론트 측에서 보낸 요청의 헤더에서 access 키에 담긴 토큰 추출
         String accessToken = request.getHeader("access");
-        log.info("[JWTFIlter] - Access token: {}", accessToken);
+        log.info("Access token: {}", accessToken);
 
         // 토큰이 없는 경우 처리 (다음 필터로 이동)
         if (accessToken != null && accessToken.startsWith("Bearer ")) {
@@ -77,20 +75,16 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
+        // username, role 값 획득
         String username = jwtUtil.getUsername(accessToken);
         Role role = Role.valueOf(jwtUtil.getRole(accessToken));
 
-        User user = userRepository.findByEmail(username);
-        if (user == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            PrintWriter writer = response.getWriter();
-            writer.println("User not found");
-            writer.close();
-            return;
-        }
+        User user = new User();
+        user.setEmail(username);
+        user.setRole(role);
+        CustomUserDetails cussUserDetails = new CustomUserDetails(user);
 
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(cussUserDetails, null, cussUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
