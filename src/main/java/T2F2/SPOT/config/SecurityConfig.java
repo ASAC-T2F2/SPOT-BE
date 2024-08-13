@@ -5,6 +5,7 @@ import T2F2.SPOT.domain.user.jwt.JWTFilter;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
 import T2F2.SPOT.domain.user.jwt.LoginFilter;
 import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
+import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.domain.user.service.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
@@ -27,14 +28,16 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
     private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository, CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, CustomUserDetailsService customUserDetailsService) {
 
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
         this.customUserDetailsService = customUserDetailsService;
     }
 
@@ -71,11 +74,11 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/", "/auth/join", "/email/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/token/reissue").permitAll()
-                        .requestMatchers("/wish/add").permitAll()
+//                        .requestMatchers("/wish/add").permitAll()
                         .anyRequest().authenticated());
 
         http
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil, userRepository), LoginFilter.class);
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper, refreshTokenRepository, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
         http
@@ -84,7 +87,7 @@ public class SecurityConfig {
         //세션 설정
         http
                 .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
         return http.build();
     }

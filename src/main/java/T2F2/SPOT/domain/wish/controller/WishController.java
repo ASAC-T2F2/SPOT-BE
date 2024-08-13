@@ -1,12 +1,15 @@
 package T2F2.SPOT.domain.wish.controller;
 
 import T2F2.SPOT.domain.post.exception.PostException;
+import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.wish.dto.AddWishRequest;
 import T2F2.SPOT.domain.wish.dto.AddWishResponse;
 import T2F2.SPOT.domain.wish.service.WishService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,13 +28,19 @@ public class WishController {
     @PostMapping("/add")
     public ResponseEntity<?> addWish(@RequestBody AddWishRequest addWishRequest) {
         try {
-            AddWishResponse response = wishService.addWish(addWishRequest);
+            // 현재 인증된 사용자 조회
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (!(authentication.getPrincipal() instanceof CustomUserDetails)) {
+                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
+            }
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String userEmail = userDetails.getUsername();
+
+            AddWishResponse response = wishService.addWish(addWishRequest, userEmail);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (UserExceptions.UserNotFoundException | PostException.PostNotFoundException e) {
-            // 사용자 또는 게시글을 찾지 못한 경우
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // 기타 예외 상황
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
