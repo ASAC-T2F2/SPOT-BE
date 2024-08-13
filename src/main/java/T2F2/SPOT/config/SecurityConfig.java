@@ -5,6 +5,7 @@ import T2F2.SPOT.domain.user.jwt.JWTFilter;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
 import T2F2.SPOT.domain.user.jwt.LoginFilter;
 import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
+import T2F2.SPOT.domain.user.service.CustomUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,13 +27,15 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, ObjectMapper objectMapper, RefreshTokenRepository refreshTokenRepository, CustomUserDetailsService customUserDetailsService) {
 
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.objectMapper = objectMapper;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
@@ -73,7 +76,7 @@ public class SecurityConfig {
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper, refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, objectMapper, refreshTokenRepository, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
