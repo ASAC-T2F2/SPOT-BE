@@ -114,16 +114,19 @@ public class EmailServiceImpl implements EmailService{
     public String verifyCode(String mail, String code) {
         Email email = emailRepository.findByEmail(mail).orElseThrow();
         LocalDateTime vaildTime = email.getCreatedDate().plusMinutes(3);
-        if(email.getVerifyCode().equals(code) && LocalDateTime.now().isBefore(vaildTime)) {
+
+        if(LocalDateTime.now().isAfter(vaildTime)) {
+            log.info("인증시간 만료");
+            return "Authentication time has expired";
+        }
+
+        if(email.getVerifyCode().equals(code)) {
             log.info("인증이 완료되었습니다");
             email.modifyEmailStatus(email.getVerifyCode().equals(code));
-            return "인증이 완료되었습니다";
+            return "Authentication has been completed";
         } else {
-            if(LocalDateTime.now().isAfter(vaildTime)) {
-                log.info("인증시간 만료");
-            }
-            log.info("인증이 실패하셨습니다");
-            return "인증에 실패하셨습니다";
+            log.info("인증에 실패하셨습니다");
+            return "Authentication failed";
         }
     }
 }

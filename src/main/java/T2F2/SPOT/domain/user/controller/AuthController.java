@@ -26,6 +26,8 @@ public class AuthController {
         try {
             authService.signUp(joinDTO);
             return ResponseEntity.ok("Successfully joined");
+        } catch (UserExceptions.NicknameAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (UserExceptions.UserSignUpException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }

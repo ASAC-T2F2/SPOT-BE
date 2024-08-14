@@ -24,6 +24,14 @@ public class AuthService {
      * @return 회원가입 성공여부
      */
     public Boolean signUp(JoinDTO joinDTO) {
+        String nickname = joinDTO.getNickname();
+
+        Boolean isExistNickname = userRepository.existsByNickname(nickname);
+
+        if(isExistNickname){
+            throw new UserExceptions.NicknameAlreadyExistsException("Nickname(" + nickname + ") already exists");
+        }
+
         try {
             User newUser = JoinDTO.toUser(joinDTO, bCryptPasswordEncoder);
             userRepository.save(newUser);
