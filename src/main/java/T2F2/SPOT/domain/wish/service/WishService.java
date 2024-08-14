@@ -3,7 +3,6 @@
     import T2F2.SPOT.domain.post.entity.Post;
     import T2F2.SPOT.domain.post.exception.PostException;
     import T2F2.SPOT.domain.post.repository.PostRepository;
-    import T2F2.SPOT.domain.user.dto.CustomUserDetails;
     import T2F2.SPOT.domain.user.entity.User;
     import T2F2.SPOT.domain.user.exception.UserExceptions;
     import T2F2.SPOT.domain.user.repository.UserRepository;
@@ -12,11 +11,7 @@
     import T2F2.SPOT.domain.wish.entity.Wish;
     import T2F2.SPOT.domain.wish.repository.WishRepository;
     import lombok.extern.slf4j.Slf4j;
-    import org.springframework.security.core.Authentication;
-    import org.springframework.security.core.context.SecurityContextHolder;
     import org.springframework.stereotype.Service;
-
-    import java.util.Optional;
 
     @Service
     @Slf4j
