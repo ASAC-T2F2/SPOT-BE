@@ -49,6 +49,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
+        log.info("Attempting to authenticate-------------------------");
         try {
             // JSON 데이터에서 사용자 인증 정보를 추출
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
