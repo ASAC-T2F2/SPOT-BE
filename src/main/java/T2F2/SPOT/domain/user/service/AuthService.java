@@ -24,14 +24,6 @@ public class AuthService {
      * @return 회원가입 성공여부
      */
     public Boolean signUp(JoinDTO joinDTO) {
-        String email = joinDTO.getEmail();
-
-        Boolean isExistUser = userRepository.existsByEmail(email);
-
-        if (isExistUser) {
-            throw new UserExceptions.EmailAlreadyExistsException("Email(" + email + ") already exists");
-        }
-
         try {
             User newUser = JoinDTO.toUser(joinDTO, bCryptPasswordEncoder);
             userRepository.save(newUser);
