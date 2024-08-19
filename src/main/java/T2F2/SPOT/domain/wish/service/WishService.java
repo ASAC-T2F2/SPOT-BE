@@ -8,10 +8,16 @@
     import T2F2.SPOT.domain.user.repository.UserRepository;
     import T2F2.SPOT.domain.wish.dto.AddWishRequest;
     import T2F2.SPOT.domain.wish.dto.AddWishResponse;
+    import T2F2.SPOT.domain.wish.dto.CancelWishRequest;
+    import T2F2.SPOT.domain.wish.dto.CancelWishResponse;
     import T2F2.SPOT.domain.wish.entity.Wish;
+    import T2F2.SPOT.domain.wish.exception.WishException;
     import T2F2.SPOT.domain.wish.repository.WishRepository;
+    import jakarta.transaction.Transactional;
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.stereotype.Service;
+
+    import java.util.Optional;
 
     @Service
     @Slf4j
@@ -32,6 +38,7 @@
          * @param addWishRequest
          * @return 추가 된 찜(대상 게시글 id, 주체 사용자 id)
          */
+        @Transactional
         public AddWishResponse addWish(AddWishRequest addWishRequest, String username) {
 
             // 사용자 확인
@@ -55,33 +62,24 @@
             return AddWishResponse.fromPost(post, user);
         }
 
-//        /**
-//         * 현재 사용자 불러오기
-//         * @return 현재 로그인 상태의 사용자
-//         */
-//        private User getAuthenticatedUser() {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            log.info("[WishService] - User: {}", authentication.getPrincipal());
-//            log.info("[WishService] - User: {}", authentication.getPrincipal().getClass().getName());
-//
-//            if (authentication == null) {
-//                throw new UserExceptions.UserNotFoundException("User is not authenticated");
-//            }
-//
-//            if (!(authentication.getPrincipal() instanceof CustomUserDetails)) {
-//                throw new UserExceptions.UserNotFoundException("User is not of type CustomUserDetails");
-//            }
-//
-//            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-//            String userEmail = userDetails.getUsername();
-//
-//            User user = userRepository.findByEmail(userEmail);
-//            if (user == null) {
-//                throw new UserExceptions.UserNotFoundException("User not found: " + userEmail);
-//            }
-//
-//            return user;
-//        }
+        /**
+         * 찜 취소(삭제)
+         * @param cancelWishRequest
+         * @return 삭제된 찜 정보(찜 Id, 대상 Id, 주체 Id)
+         */
+        @Transactional
+        public CancelWishResponse cancelWish(CancelWishRequest cancelWishRequest) {
+
+            Long wishId = cancelWishRequest.getWishId();
+
+            Wish wish = wishRepository.findById(wishId)
+                            .orElseThrow(() -> new WishException.WishNotFoundException("Wish Not Found: " + wishId));
+
+            wishRepository.delete(wish);
+
+            return CancelWishResponse.fromWish(wish);
+        }
+
 
         /**
          * Id 기반 게시글 불러오기
