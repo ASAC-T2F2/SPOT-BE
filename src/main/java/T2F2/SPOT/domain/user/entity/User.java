@@ -10,6 +10,7 @@ import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,8 +4,10 @@ import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class Wish extends BaseEntity {
 
     @Id
