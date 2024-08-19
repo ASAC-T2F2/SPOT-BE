@@ -6,10 +6,7 @@
     import T2F2.SPOT.domain.user.entity.User;
     import T2F2.SPOT.domain.user.exception.UserExceptions;
     import T2F2.SPOT.domain.user.repository.UserRepository;
-    import T2F2.SPOT.domain.wish.dto.AddWishRequest;
-    import T2F2.SPOT.domain.wish.dto.AddWishResponse;
-    import T2F2.SPOT.domain.wish.dto.CancelWishRequest;
-    import T2F2.SPOT.domain.wish.dto.CancelWishResponse;
+    import T2F2.SPOT.domain.wish.dto.*;
     import T2F2.SPOT.domain.wish.entity.Wish;
     import T2F2.SPOT.domain.wish.exception.WishException;
     import T2F2.SPOT.domain.wish.repository.WishRepository;
@@ -17,7 +14,8 @@
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.stereotype.Service;
 
-    import java.util.Optional;
+    import java.util.ArrayList;
+    import java.util.List;
 
     @Service
     @Slf4j
@@ -79,6 +77,23 @@
 
             return CancelWishResponse.fromWish(wish);
         }
+
+
+//        public List<PreviewWishResponse> findAllWish(String username) {
+//
+//            User user = userRepository.findByEmail(username);
+//
+//            if (user == null) {
+//                throw new UserExceptions.UserNotFoundException("User not found: " + username);
+//            }
+//
+//            List<Wish> wishes = wishRepository.findAllByUserId(user.getId())
+//                    .orElseThrow(() -> new WishException.WishNotFoundException("Wish Not Found: " + username));
+//
+//            List<PreviewWishResponse> responses =
+//
+//            return
+//        }
 
 
         /**
