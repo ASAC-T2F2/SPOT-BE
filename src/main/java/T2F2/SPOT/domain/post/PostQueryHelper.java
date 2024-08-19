@@ -17,6 +17,7 @@ public class PostQueryHelper {
      * @return
      */
     public static OrderSpecifier<?> getOrderSpecifier(SortBy sortBy, QPost post) {
+
         if (sortBy == null) {
             // sort가 null인 경우 기본 정렬 기준으로 처리
             return post.createdDate.desc();
@@ -53,6 +54,8 @@ public class PostQueryHelper {
                     post.postStatus.eq(postStatus)
             );
         }
+
+        condition.and(post.price.between(minPrice, maxPrice));
 
     }
     // 카테고리 분류

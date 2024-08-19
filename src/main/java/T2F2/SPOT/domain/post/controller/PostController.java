@@ -30,17 +30,17 @@ public class PostController {
         postService.createPost(createPostDto);
     }
 
-//    @GetMapping("api/posts")
-//    public List<responsePostDto> getListPost(){
-//        return postService.findAllPost();
-//    }
+    @GetMapping("api/posts")
+    public List<responsePostDto> getListPost(){
+        return postService.findAllPost();
+    }
 
     @GetMapping("api/post/{id}")
     public responsePostDto getDetailPost(@PathVariable("id") Long id) {
         return postService.findPostById(id);
     }
 
-    @GetMapping("api/posts")
+    @GetMapping("api/posts/querydsl")
     public Slice<QPostDto> getSearchAndFilterAndSortPosts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Category category,

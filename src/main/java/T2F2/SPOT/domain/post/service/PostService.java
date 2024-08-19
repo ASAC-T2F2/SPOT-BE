@@ -67,7 +67,7 @@ public class PostService {
             SortBy sortBy,
             int startIndex
             ) {
-        Pageable pageable = PageRequest.of(startIndex, 3);
+        Pageable pageable = PageRequest.of(startIndex, 10);
         SearchPostConditionDto condition = SearchPostConditionDto.of(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy);
         log.info("Keyword : {}, Category : {}, PostFor : {}, PostStatus : {}, price : {} ~ {}, Sort : {}, StartIndex : {} ", condition.getKeyword(), condition.getCategory(),
                 condition.getPostFor(), condition.getPostStatus(), condition.getMinPrice(), condition.getMaxPrice(), condition.getSortBy(), startIndex
