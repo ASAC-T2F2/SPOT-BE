@@ -4,6 +4,7 @@ import T2F2.SPOT.domain.post.dto.QPostDto;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
 import T2F2.SPOT.domain.post.entity.Post;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .selectFrom(post)
                 .where(condition)
                 .orderBy(getOrderSpecifier(searchPostConditionDto.getSortBy(), post))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
                 .fetch()
                 .stream()
                 .map(post -> post.getIsDeleted() ? null : post)
