@@ -2,6 +2,8 @@ package T2F2.SPOT.domain.wish.repository;
 
 import T2F2.SPOT.domain.wish.entity.Wish;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +14,7 @@ public interface WishRepository extends JpaRepository<Wish, Integer>, CustomWish
 
     Optional<Wish> findById(Long id);
 
-    Optional<List<Wish>> findAllByUserId(Long userId);
+    @Query("SELECT w FROM Wish w JOIN FETCH w.post WHERE w.user.email =: userEmail")
+    Optional<List<Wish>> findAllByUserEmailWithPost(@Param("userEmail") String userEmail);
 }
 

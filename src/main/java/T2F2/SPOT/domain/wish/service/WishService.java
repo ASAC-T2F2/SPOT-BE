@@ -14,8 +14,8 @@
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.stereotype.Service;
 
-    import java.util.ArrayList;
     import java.util.List;
+    import java.util.stream.Collectors;
 
     @Service
     @Slf4j
@@ -79,21 +79,19 @@
         }
 
 
-//        public List<PreviewWishResponse> findAllWish(String username) {
-//
-//            User user = userRepository.findByEmail(username);
-//
-//            if (user == null) {
-//                throw new UserExceptions.UserNotFoundException("User not found: " + username);
-//            }
-//
-//            List<Wish> wishes = wishRepository.findAllByUserId(user.getId())
-//                    .orElseThrow(() -> new WishException.WishNotFoundException("Wish Not Found: " + username));
-//
-//            List<PreviewWishResponse> responses =
-//
-//            return
-//        }
+        public List<PreviewWishResponse> findAllWish(String userEmail) {
+
+            List<Wish> wishes = wishRepository.findAllByUserEmailWithPost(userEmail)
+                    .orElseThrow(() -> new WishException.WishNotFoundException("Wish Not Found: " + userEmail));
+
+            log.info("[FindAllWish] - Wishes: {}", wishes);
+
+            List<PreviewWishResponse> responses = wishes.stream()
+                    .map(wish -> PreviewWishResponse.fromWish(wish, wish.getPost()))
+                    .collect(Collectors.toList());
+
+            return responses;
+        }
 
 
         /**
