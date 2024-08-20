@@ -62,8 +62,8 @@ public class PostService {
             Category category,
             PostFor postFor,
             PostStatus postStatus,
-            String minPrice,
-            String maxPrice,
+            int minPrice,
+            int maxPrice,
             SortBy sortBy,
             int startIndex
             ) {

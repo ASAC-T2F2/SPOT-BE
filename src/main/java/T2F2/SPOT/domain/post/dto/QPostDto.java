@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 public class QPostDto {
     Long id;
     String title;
-    String price;
+    int price;
 
-    private QPostDto(Long id, String title, String price) {
+    private QPostDto(Long id, String title, int price) {
         this.id = id;
         this.title = title;
         this.price = price;

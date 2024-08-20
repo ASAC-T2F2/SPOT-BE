@@ -14,5 +14,5 @@ public class CreatePostDto {
     private String content;
     private PostFor postFor;
     private PostStatus postStatus;
-    private String price;
+    private int price;
 }

@@ -46,8 +46,8 @@ public class PostController {
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) PostStatus postStatus,
             @RequestParam(required = false) PostFor postFor,
-            @RequestParam(defaultValue = "0") String minPrice,
-            @RequestParam(defaultValue = "1000000") String maxPrice,
+            @RequestParam(defaultValue = "0") int minPrice,
+            @RequestParam(defaultValue = "1000000") int maxPrice,
             @RequestParam(required = false) SortBy sortBy,
             @RequestParam(defaultValue = "0") int startIndex
             ) {

@@ -42,7 +42,7 @@ public class PostQueryHelper {
         return condition;
     }
 
-    private static void addPostCondition(PostFor postFor, PostStatus postStatus, String minPrice, String maxPrice,
+    private static void addPostCondition(PostFor postFor, PostStatus postStatus, int minPrice, String maxPrice,
                                          BooleanBuilder condition, QPost post) {
         if(postFor != null) {
             condition.and(

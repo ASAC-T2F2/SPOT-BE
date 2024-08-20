@@ -19,11 +19,11 @@ public class responsePostDto {
     private String content;
     private String userNickname;
     private PostStatus postStatus;
-    private String price;
+    private int price;
     private int wish_count;
     private LocalDateTime post_date;
 
-    public responsePostDto(String title, String content, User user, PostStatus postStatus, String price, int wish_count, LocalDateTime post_date) {
+    public responsePostDto(String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date) {
         this.title = title;
         this.content = content;
         this.userNickname = user.getNickname();

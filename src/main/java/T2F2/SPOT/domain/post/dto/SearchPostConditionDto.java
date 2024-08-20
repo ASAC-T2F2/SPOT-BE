@@ -12,12 +12,12 @@ public class SearchPostConditionDto {
     Category category;
     PostFor postFor;
     PostStatus postStatus;
-    String minPrice;
-    String maxPrice;
+    int minPrice;
+    int maxPrice;
     SortBy sortBy;
 
     private SearchPostConditionDto(String keyword, Category category, PostFor postFor, PostStatus postStatus,
-                                   String minPrice, String maxPrice, SortBy sortBy) {
+                                   int minPrice, int maxPrice, SortBy sortBy) {
         this.keyword = keyword;
         this.category = category;
         this.postFor = postFor;
@@ -29,7 +29,7 @@ public class SearchPostConditionDto {
 
     public static SearchPostConditionDto of(
             String keyword, Category category, PostFor postFor, PostStatus postStatus,
-            String minPrice, String maxPrice, SortBy sortBy) {
+            int minPrice, int maxPrice, SortBy sortBy) {
         return new SearchPostConditionDto(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy);
     }
 }

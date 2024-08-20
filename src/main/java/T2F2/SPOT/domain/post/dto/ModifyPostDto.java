@@ -9,5 +9,6 @@ public class ModifyPostDto {
 
     String title;
     String content;
-    String price;
+    int price;
+
 }

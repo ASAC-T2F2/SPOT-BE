@@ -38,7 +38,7 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus postStatus;
 
-    private String price;
+    private int price;
 
     @ColumnDefault("FALSE")
     private Boolean isDeleted;
@@ -64,7 +64,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 
-    private Post(String title, String content, PostFor postFor, PostStatus postStatus, String price, User user) {
+    private Post(String title, String content, PostFor postFor, PostStatus postStatus, int price, User user) {
         this.title = title;
         this.content = content;
         this.postFor = postFor;
