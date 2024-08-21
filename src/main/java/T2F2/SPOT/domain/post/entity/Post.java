@@ -57,4 +57,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
+
+    /* 내부 로직 */
+    public String getFirstImageOrDefault() {
+        return postImages.isEmpty() ? "default" : postImages.get(0).toString();
+    }
 }

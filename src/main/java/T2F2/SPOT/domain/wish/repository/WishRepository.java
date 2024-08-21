@@ -14,7 +14,7 @@ public interface WishRepository extends JpaRepository<Wish, Integer>, CustomWish
 
     Optional<Wish> findById(Long id);
 
-    @Query("SELECT w FROM Wish w JOIN FETCH w.post WHERE w.user.email =: userEmail")
+    @Query("SELECT w FROM Wish w JOIN FETCH w.post WHERE w.user.email = :userEmail")
     Optional<List<Wish>> findAllByUserEmailWithPost(@Param("userEmail") String userEmail);
 }
 

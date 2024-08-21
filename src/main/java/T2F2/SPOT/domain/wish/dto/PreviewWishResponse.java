@@ -24,7 +24,7 @@ public class PreviewWishResponse {
         return new PreviewWishResponse(
                 wish.getId(),
                 post.getId(),
-                post.getPostImages().get(0).toString(),
+                post.getFirstImageOrDefault(),
                 post.getPostTitle(),
                 post.getPostContent(),
                 post.getUser().getNickname(),
