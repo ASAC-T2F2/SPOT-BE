@@ -55,7 +55,7 @@ public class PostQueryHelper {
             );
         }
 
-//        condition.and(post.price.between(minPrice, maxPrice));
+        condition.and(post.price.between(minPrice, maxPrice));
 
     }
     // 카테고리 분류
