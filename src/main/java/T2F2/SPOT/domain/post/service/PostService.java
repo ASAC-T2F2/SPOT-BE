@@ -79,7 +79,8 @@ public class PostService {
     }
     @Transactional(readOnly = true)
     public List<QPostDto> findPostByMajor(String major) {
-        return postRepository.findByMajor(major).stream()
+        return postRepository.findByMajor(major)
+                .stream()
                 .map(post ->
                         post.getIsDeleted() ? null : QPostDto.of(post))
                 .filter(Objects::nonNull)

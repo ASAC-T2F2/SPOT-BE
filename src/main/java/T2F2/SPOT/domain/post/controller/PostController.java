@@ -56,10 +56,9 @@ public class PostController {
         return postService.getSearchFilterList(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy, startIndex);
     }
 
-    @GetMapping("api/post/{major}")
+    @GetMapping("api/post/feed/{major}")
     public List<QPostDto> getPostFilterByMajor(
-            @PathVariable("major") String major
-    ){
+            @PathVariable("major") String major){
         return postService.findPostByMajor(major);
     }
     @PutMapping("api/post/updateStatus/{id}/{status}")
