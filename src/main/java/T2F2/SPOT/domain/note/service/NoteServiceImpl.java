@@ -28,17 +28,22 @@ public class NoteServiceImpl {
         return noteRoomRepository.findById(id).orElseThrow();
     }
 
-    public NoteRoom createRoom(Post post, User sender, User buyer) {
-        return noteRoomRepository.save(NoteRoom.createRoom(post, sender, buyer));
+    public NoteRoom createRoom(Post post, User sender, User receiver) {
+        NoteRoom existingRoom = noteRoomRepository.findByPostAndSenderAndReceiver(post, sender, receiver);
+        if(existingRoom != null) {
+            return existingRoom;
+        }
+        NoteRoom newRoom = NoteRoom.createRoom(post, sender, receiver);
+        return noteRoomRepository.save(newRoom);
     }
 
-    public Note createNote(Long noteRoomId, String noteContent, String sender) {
+    public Note createNote(Long noteRoomId, String noteContent, String senderNickname) {
 
-        User senderName = userRepository.findByNickname(sender);
+        User sender = userRepository.findByNickname(senderNickname).orElseThrow(() -> new RuntimeException("User not found"));
 
-        NoteRoom room = noteRoomRepository.findById(noteRoomId).orElseThrow();
+        NoteRoom room = noteRoomRepository.findById(noteRoomId).orElseThrow(() -> new RuntimeException("NoteRoom not found"));
 
-        return noteRepository.save(Note.createNote(noteContent, senderName, room));
+        return noteRepository.save(Note.createNote(noteContent, sender, room));
     }
 
     public List<Note> findAllNoteByNoteRoomId(Long noteRoomId) {

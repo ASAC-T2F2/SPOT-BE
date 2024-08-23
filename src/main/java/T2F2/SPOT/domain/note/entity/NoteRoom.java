@@ -36,21 +36,21 @@ public class NoteRoom extends BaseEntity {
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "buyer_id")
-    private User buyer;
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @Builder
-    public NoteRoom(Post post, User sender, User buyer) {
+    public NoteRoom(Post post, User sender, User receiver) {
         this.post = post;
         this.sender = sender;
-        this.buyer = buyer;
+        this.receiver = receiver;
     }
 
-    public static NoteRoom createRoom(Post post, User sender, User buyer) {
+    public static NoteRoom createRoom(Post post, User sender, User receiver) {
         return NoteRoom.builder()
                 .post(post)
                 .sender(sender)
-                .buyer(buyer)
+                .receiver(receiver)
                 .build();
     }
 }

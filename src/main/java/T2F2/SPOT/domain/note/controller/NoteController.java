@@ -16,14 +16,14 @@ public class NoteController {
 
     private final NoteServiceImpl noteService;
 
-    @MessageMapping("{noteRoomId}")
-    @SendTo("/room/{roomId}")
+    @MessageMapping("/room/{noteRoomId}")
+    @SendTo("/sub/room/{noteRoomId}")
     public NoteMessage test(@DestinationVariable Long roomId, NoteMessage message) {
 
         Note note = noteService.createNote(roomId, message.getSender(), message.getNoteContent());
         return NoteMessage.builder()
                 .roomId(roomId)
-                .sender(note.getSender())
+                .sender(note.getSender().getNickname())
                 .noteContent(note.getNoteContent())
                 .build();
     }

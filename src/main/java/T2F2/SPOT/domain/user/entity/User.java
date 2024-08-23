@@ -55,10 +55,14 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Note> notes = new ArrayList<>();
+//    @OneToMany(mappedBy = "sender")
+//    private List<Note> notes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<NoteRoom> noteRooms = new ArrayList<>();
+//    @OneToMany(mappedBy = "sender")
+//    private List<NoteRoom> sentNoteRooms = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "receiver")
+//    private List<NoteRoom> receivedNoteRooms = new ArrayList<>();
+
 }
 
