@@ -60,4 +60,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetch();
     }
 
+    @Override
+    public List<Post> findByUserId(Long userId) {
+        return queryFactory
+                .selectFrom(post)
+                .join(post.user, user)
+                .where(user.id.eq(userId))
+                .fetch();
+    }
+
 }

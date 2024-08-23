@@ -86,6 +86,15 @@ public class PostService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
+    public List<QPostDto> findPostByUserId(Long userId) {
+        return postRepository.findByUserId(userId)
+                .stream()
+                .map(post ->
+                        post.getIsDeleted() ? null : QPostDto.of(post))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
     public void updateStatus(Long id, String status) {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
@@ -103,4 +112,5 @@ public class PostService {
         }
         findPost.modifyPost(modifyPostDto);
     }
+
 }

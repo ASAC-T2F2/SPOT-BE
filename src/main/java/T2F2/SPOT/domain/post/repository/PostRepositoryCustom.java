@@ -14,4 +14,6 @@ public interface PostRepositoryCustom {
             SearchPostConditionDto searchPostConditionDto
     );
     List<Post> findByMajor(String major);
+
+    List<Post> findByUserId(Long userId);
 }
