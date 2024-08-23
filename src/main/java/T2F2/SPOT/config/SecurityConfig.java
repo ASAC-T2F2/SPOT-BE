@@ -65,7 +65,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/auth/join", "/email/**").permitAll()
+                        .requestMatchers("/login", "/", "/auth/join", "/email/**", "/api/**").permitAll()
                         .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/wish/add", "/wish/cancel").hasAuthority("USER")
                         .requestMatchers("/token/reissue").permitAll()

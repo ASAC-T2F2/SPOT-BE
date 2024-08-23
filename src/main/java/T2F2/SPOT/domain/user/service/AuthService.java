@@ -24,12 +24,12 @@ public class AuthService {
      * @return 회원가입 성공여부
      */
     public Boolean signUp(JoinDTO joinDTO) {
-        String email = joinDTO.getEmail();
+        String nickname = joinDTO.getNickname();
 
-        Boolean isExistUser = userRepository.existsByEmail(email);
+        Boolean isExistNickname = userRepository.existsByNickname(nickname);
 
-        if (isExistUser) {
-            throw new UserExceptions.EmailAlreadyExistsException("Email(" + email + ") already exists");
+        if(isExistNickname){
+            throw new UserExceptions.NicknameAlreadyExistsException("Nickname(" + nickname + ") already exists");
         }
 
         try {

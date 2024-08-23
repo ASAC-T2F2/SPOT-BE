@@ -23,6 +23,13 @@ public class UserExceptions {
     }
 
     /**
+     * 닉네임이 이미 존재
+     */
+    public static class NicknameAlreadyExistsException extends UserSignUpException {
+        public NicknameAlreadyExistsException(String message) {super(message);}
+    }
+
+    /**
      * 회원가입 실패
      */
     public static class SignUpFailedException extends UserSignUpException {

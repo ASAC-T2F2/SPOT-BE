@@ -4,18 +4,23 @@ import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
+import T2F2.SPOT.domain.post.dto.CreatePostDto;
+import T2F2.SPOT.domain.post.dto.ModifyPostDto;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
 public class Post extends BaseEntity {
 
     @Id
@@ -23,9 +28,9 @@ public class Post extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String postTitle;
+    private String title;
 
-    private String postContent;
+    private String content;
 
     @Enumerated(EnumType.STRING)
     private PostFor postFor;
@@ -33,8 +38,9 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus postStatus;
 
-    private String price;
+    private int price;
 
+    @ColumnDefault("FALSE")
     private Boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -58,7 +64,44 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 
-    /* 내부 로직 */
+    private Post(String title, String content, PostFor postFor, PostStatus postStatus, int price, User user) {
+        this.title = title;
+        this.content = content;
+        this.postFor = postFor;
+        this.postStatus = postStatus;
+        this.price = price;
+        this.user = user;
+        this.isDeleted = false;
+    }
+
+
+    public static Post of(CreatePostDto createPostDto, User user) {
+        return new Post(
+                createPostDto.getTitle(),
+                createPostDto.getContent(),
+                createPostDto.getPostFor(),
+                createPostDto.getPostStatus(),
+                createPostDto.getPrice(),
+                user
+        );
+    }
+
+    public void updatePostStatus(String postStatus) {
+        switch (postStatus) {
+            case "DELETE" -> this.isDeleted = true;
+            case "TRADING" -> this.postStatus = PostStatus.TRADING;
+            case "TRADE_COMPLETE" -> this.postStatus = PostStatus.TRADE_COMPLETE;
+        }
+    }
+
+    public void modifyPost(ModifyPostDto modifyPostDto) {
+        this.title = modifyPostDto.getTitle();
+        this.content = modifyPostDto.getContent();
+        this.price = modifyPostDto.getPrice();
+
+    }
+
+
     public String getFirstImageOrDefault() {
         return postImages.isEmpty() ? "default" : postImages.get(0).toString();
     }
