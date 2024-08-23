@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface WishRepository extends JpaRepository<Wish, Integer>, CustomWishRepository {
 
-    Optional<Wish> findById(Long id);
+    @Query("SELECT w FROM Wish w WHERE w.post.id = :postId AND w.user.email = :userEmail")
+    Optional<Wish> findByPostIdAndUserEmail(@Param("postId") Long postId, @Param("userEmail") String userEmail);
 
     @Query("SELECT w FROM Wish w JOIN FETCH w.post WHERE w.user.email = :userEmail")
     Optional<List<Wish>> findAllByUserEmailWithPost(@Param("userEmail") String userEmail);

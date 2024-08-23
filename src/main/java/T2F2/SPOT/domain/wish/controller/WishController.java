@@ -53,7 +53,16 @@ public class WishController {
     public ResponseEntity<?> cancelWish(@RequestBody CancelWishRequest cancelWishRequest) {
 
         try {
-            CancelWishResponse cancelWishResponse = wishService.cancelWish(cancelWishRequest);
+            // 현재 인증된 사용자 조회
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
+            }
+
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String userEmail = userDetails.getUsername();
+
+            CancelWishResponse cancelWishResponse = wishService.cancelWish(cancelWishRequest, userEmail);
             return new ResponseEntity<>(cancelWishResponse, HttpStatus.OK);
         } catch (WishException.WishNotFoundException e) {
             log.error("Error while canceling wish", e);

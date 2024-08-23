@@ -66,12 +66,12 @@
          * @return 삭제된 찜 정보(찜 Id, 대상 Id, 주체 Id)
          */
         @Transactional
-        public CancelWishResponse cancelWish(CancelWishRequest cancelWishRequest) {
+        public CancelWishResponse cancelWish(CancelWishRequest cancelWishRequest, String username) {
 
-            Long wishId = cancelWishRequest.getWishId();
+            Long targetPostId = cancelWishRequest.getTargetPostId();
 
-            Wish wish = wishRepository.findById(wishId)
-                            .orElseThrow(() -> new WishException.WishNotFoundException("Wish Not Found: " + wishId));
+            Wish wish = wishRepository.findByPostIdAndUserEmail(targetPostId, username)
+                            .orElseThrow(() -> new WishException.WishNotFoundException("Wish not found for target post: " + targetPostId + ", username: " + username));
 
             wishRepository.delete(wish);
 

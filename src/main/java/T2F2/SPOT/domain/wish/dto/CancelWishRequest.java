@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class CancelWishRequest {
 
-    private Long wishId;
+    private Long targetPostId;
 }
