@@ -18,15 +18,15 @@ public class PreviewWishResponse {
     private String title;
     private String content;
     private String writer;
-    private String price;
+    private int price;
 
     public static PreviewWishResponse fromWish(Wish wish, Post post) {
         return new PreviewWishResponse(
                 wish.getId(),
                 post.getId(),
                 post.getFirstImageOrDefault(),
-                post.getPostTitle(),
-                post.getPostContent(),
+                post.getTitle(),
+                post.getContent(),
                 post.getUser().getNickname(),
                 post.getPrice()
         );
