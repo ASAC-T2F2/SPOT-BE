@@ -77,7 +77,14 @@ public class PostService {
                 condition
         );
     }
-
+    @Transactional(readOnly = true)
+    public List<QPostDto> findPostByMajor(String major) {
+        return postRepository.findByMajor(major).stream()
+                .map(post ->
+                        post.getIsDeleted() ? null : QPostDto.of(post))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
     public void updateStatus(Long id, String status) {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
