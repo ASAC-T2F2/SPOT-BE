@@ -49,8 +49,11 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Wish> wishes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Review> reviews = new ArrayList<>();
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    private List<Review> sendReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver")
+    private List<Review> receivedReviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();

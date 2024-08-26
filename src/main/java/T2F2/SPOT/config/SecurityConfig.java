@@ -68,6 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/", "/auth/join", "/email/**", "/api/**").permitAll()
                         .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/wish/add", "/wish/cancel").hasAuthority("USER")
+                        .requestMatchers("/review/**").hasAuthority("USER")
                         .requestMatchers("/token/reissue").permitAll()
                         .anyRequest().authenticated());
 

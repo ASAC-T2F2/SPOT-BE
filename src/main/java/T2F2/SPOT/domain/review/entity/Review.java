@@ -5,8 +5,13 @@ import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
 
     @Id
@@ -22,8 +27,12 @@ public class Review extends BaseEntity {
     // 생성 일자
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "sender_id")
+    private User sender;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @OneToOne(mappedBy = "review", fetch = FetchType.LAZY)
     private Post post;
