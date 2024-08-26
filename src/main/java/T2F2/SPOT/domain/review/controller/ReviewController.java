@@ -3,6 +3,7 @@ package T2F2.SPOT.domain.review.controller;
 import T2F2.SPOT.domain.post.exception.PostException;
 import T2F2.SPOT.domain.review.dto.ReviewResponse;
 import T2F2.SPOT.domain.review.dto.CreateReviewRequest;
+import T2F2.SPOT.domain.review.exception.ReviewException;
 import T2F2.SPOT.domain.review.service.ReviewService;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
@@ -43,8 +44,9 @@ public class ReviewController {
 
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (UserExceptions.UserNotFoundException | PostException.PostNotFoundException e) {
-
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (ReviewException.ReviewAlreadyExist e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

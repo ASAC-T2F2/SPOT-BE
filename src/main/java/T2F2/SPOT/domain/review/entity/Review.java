@@ -34,6 +34,18 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
-    @OneToOne(mappedBy = "review", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    /* 생성 메소드 */
+    public static Review createReview(User sender, User receiver, Post post, float rate, String message) {
+        return Review.builder()
+                .sender(sender)
+                .receiver(receiver)
+                .post(post)
+                .rate(rate)
+                .message(message)
+                .build();
+    }
 }

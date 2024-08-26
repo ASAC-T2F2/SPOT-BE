@@ -6,6 +6,7 @@ import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.review.dto.CreateReviewRequest;
 import T2F2.SPOT.domain.review.dto.ReviewResponse;
 import T2F2.SPOT.domain.review.entity.Review;
+import T2F2.SPOT.domain.review.exception.ReviewException;
 import T2F2.SPOT.domain.review.repository.ReviewRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
@@ -13,8 +14,6 @@ import T2F2.SPOT.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -37,22 +36,16 @@ public class ReviewService {
         User sender = userRepository.findByEmail(username);
         User receiver = userRepository.findById(createReviewRequest.getReceiverId())
                 .orElseThrow(() -> new UserExceptions.UserNotFoundException("리뷰 대상을 찾을 수 없습니다."));
-
-        log.info("리뷰 작성자 : {}", sender);
-        log.info("리뷰 대상 : {}", receiver);
+        log.info("리뷰 작성자 : {}", sender.getId());
+        log.info("리뷰 대상 : {}", receiver.getId());
 
         Post targetPost = postRepository.findById(createReviewRequest.getPostId())
                 .orElseThrow(() -> new PostException.PostNotFoundException("리뷰 대상 게시글을 찾을 수 없습니다."));
+        log.info("리뷰 대상 게시글 : {}", targetPost.getId());
 
-        log.info("리뷰 대상 게시글 : {}", targetPost);
+        checkReviewExistence(sender, receiver, targetPost);
 
-        Review review = Review.builder()
-                        .rate(createReviewRequest.getRate())
-                        .message(createReviewRequest.getMessage())
-                        .sender(sender)
-                        .receiver(receiver)
-                        .post(targetPost)
-                        .build();
+        Review review = Review.createReview(sender, receiver, targetPost, createReviewRequest.getRate(), createReviewRequest.getMessage());
 
         ReviewResponse reviewResponse = ReviewResponse.from(review);
         reviewRepository.save(review);
@@ -63,5 +56,17 @@ public class ReviewService {
         /* 리뷰대상 등급 관련 로직 */
 
         return reviewResponse;
+    }
+
+    /**
+     * 이미 리뷰를 작성했는지 검증
+     * @param sender
+     * @param receiver
+     * @param targetPost
+     */
+    private void checkReviewExistence(User sender, User receiver, Post targetPost) {
+        if (reviewRepository.existsBySenderAndReceiverAndPost(sender, receiver, targetPost)) {
+            throw new ReviewException.ReviewAlreadyExist("이미 리뷰를 작성했습니다. \nsender: " + sender.getId() + ", receiver: " + receiver.getId() + ", post: " + targetPost.getId());
+        }
     }
 }
