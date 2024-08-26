@@ -47,13 +47,17 @@ public class ReviewService {
 
         Review review = Review.createReview(sender, receiver, targetPost, createReviewRequest.getRate(), createReviewRequest.getMessage());
 
-        ReviewResponse reviewResponse = ReviewResponse.from(review);
-        reviewRepository.save(review);
-
         /* 리뷰대상 (매너)점수 관련 로직 */
-
+        float reviewRate = review.getRate();
+        float updatedMannerScore = receiver.updateMannerScore(createReviewRequest.getRate());
+        log.info("[Review Service]Before updateMannerScore, reviewRate: {}", reviewRate);
+        log.info("[Review Service]After updateMannerScore, receiver's mannerScore: {}", updatedMannerScore);
 
         /* 리뷰대상 등급 관련 로직 */
+
+
+        ReviewResponse reviewResponse = ReviewResponse.from(review);
+        reviewRepository.save(review);
 
         return reviewResponse;
     }

@@ -35,6 +35,7 @@ public class User extends BaseEntity {
     private String entranceYear;
     private Boolean isDeleted;
     private String imageUrl;
+    private float mannerScore;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 50)
@@ -63,5 +64,18 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<NoteRoom> noteRooms = new ArrayList<>();
+
+    /* 매너온도 업데이트 */
+    public float updateMannerScore(float reviewScore) {
+
+        float roundedReviewScore = Math.round(reviewScore * 10) / 10.0f;
+        this.mannerScore = this.mannerScore + (roundedReviewScore - this.mannerScore) / 10;
+        this.mannerScore = Math.round(this.mannerScore * 10) / 10.0f;
+
+        return this.mannerScore;
+    }
+
+    /* 등급 체크 및 업데이트 */
+
 }
 
