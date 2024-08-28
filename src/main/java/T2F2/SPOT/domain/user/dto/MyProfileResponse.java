@@ -11,13 +11,15 @@ import lombok.Getter;
 public class MyProfileResponse {
 
     private Long userId;
-    private String userEmail;
+    private String email;
     private String nickname;
     private String university;
     private String major;
     private String entranceYear;
     private String profileImageUrl;
     private float mannerScore;
+    private int completedPostCount;
+    private int tradingPostCount;
 
     private GradeInfo grade;
 
@@ -30,6 +32,8 @@ public class MyProfileResponse {
                 user.getEntranceYear(),
                 user.getImageUrl(),
                 user.getMannerScore(),
+                user.getCompletedPostCount(),
+                user.getTradingPostCount(),
                 GradeInfo.from(user.getGrade())
         );
     }
