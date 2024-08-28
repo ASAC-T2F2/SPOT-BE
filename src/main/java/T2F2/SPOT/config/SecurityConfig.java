@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/wish/add", "/wish/cancel").hasAuthority("USER")
                         .requestMatchers("/review/**").hasAuthority("USER")
+                        .requestMatchers("/user/**").hasAuthority("USER")
                         .requestMatchers("/token/reissue").permitAll()
                         .anyRequest().authenticated());
 
