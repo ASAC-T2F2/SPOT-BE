@@ -2,6 +2,7 @@ package T2F2.SPOT.domain.user.dto;
 
 import T2F2.SPOT.domain.user.Role;
 import T2F2.SPOT.domain.user.entity.User;
+import T2F2.SPOT.domain.user.grade.Grade;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,8 +31,10 @@ public class JoinDTO {
                 .major(joinDTO.getMajor())
                 .entranceYear(joinDTO.getEntranceYear())
                 .imageUrl(joinDTO.getImageUrl())
+                .mannerScore(3.0F)
                 .isDeleted(false)
                 .role(Role.USER)
+                .grade(Grade.FRESHMAN)
                 .build();
     }
 }
