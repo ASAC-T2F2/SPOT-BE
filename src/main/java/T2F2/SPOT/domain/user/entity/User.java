@@ -94,6 +94,16 @@ public class User extends BaseEntity {
     }
 
     /**
+     * 사용자의 거래중 게시글 카운트
+     * @return 거래중 상태인 게시글 개수
+     */
+    public int getTradingPostCount() {
+        return (int) posts.stream()
+                .filter(post -> post.getPostStatus() == PostStatus.TRADING)
+                .count();
+    }
+
+    /**
      * 현재 사용자의 등급 평가
      * @return 평가 완료된 최종 등급
      */
