@@ -51,11 +51,22 @@ public class PostController {
             @RequestParam(required = false) SortBy sortBy,
             @RequestParam(defaultValue = "0") int startIndex
             ) {
-
-
         return postService.getSearchFilterList(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy, startIndex);
     }
 
+    @GetMapping("api/post/feed/major/{major}")
+    public List<QPostDto> getPostFilterByMajor(
+            @PathVariable("major") String major){
+
+        return postService.findPostByMajor(major);
+    }
+
+    @GetMapping("api/post/feed/user/{userId}")
+    public List<QPostDto> getPostFilterByUserId(
+            @PathVariable("userId") Long userId
+    ) {
+        return postService.findPostByUserId(userId);
+    }
     @PutMapping("api/post/updateStatus/{id}/{status}")
     public void updateStatus(
             @PathVariable("id") Long id,
