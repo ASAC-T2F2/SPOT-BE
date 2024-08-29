@@ -28,7 +28,7 @@ public class TokenController {
 
         try {
             String newAccessToken = tokenService.reissueToken(request, response);
-            return new ResponseEntity<>(newAccessToken, HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (TokenException.RefreshTokenIsNullException | TokenException.RefreshTokenExpiredException | TokenException.InvalidTokenCategory | TokenException.InvalidRefreshToken e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

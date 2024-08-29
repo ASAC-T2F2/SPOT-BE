@@ -54,9 +54,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private Review review;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Wish> wishes = new ArrayList<>();
@@ -99,5 +98,10 @@ public class Post extends BaseEntity {
         this.content = modifyPostDto.getContent();
         this.price = modifyPostDto.getPrice();
 
+    }
+
+
+    public String getFirstImageOrDefault() {
+        return postImages.isEmpty() ? "default" : postImages.get(0).toString();
     }
 }
