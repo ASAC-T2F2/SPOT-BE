@@ -30,42 +30,27 @@ public class AWSService {
         if(filename == null || filename.equals("")) {
             return null;
         }
-
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(filename)
-                .build();
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(filename)
                 .build();
 
-        log.info(getObjectRequest.toString());
         log.info(putObjectRequest.toString());
 
-        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5)) // presignedURL 5분간 접근 허용
-                .getObjectRequest(getObjectRequest)
-                .build();
-
         PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5))
+                .signatureDuration(Duration.ofMinutes(5)) // presignedURL 5분간 접근 허용
                 .putObjectRequest(putObjectRequest)
                 .build();
 
-        log.info(getObjectPresignRequest.toString());
         log.info(putObjectPresignRequest.toString());
 
-        PresignedGetObjectRequest presignedGetObjectRequest = presigner
-                .presignGetObject(getObjectPresignRequest);
 
         PresignedPutObjectRequest presignedPutObjectRequest = presigner
                 .presignPutObject(putObjectPresignRequest);
 
         String url = presignedPutObjectRequest.url().toString();
-//        String url = presignedGetObjectRequest.url().toString();
         log.info(url);
-//        presigner.close(); // presigner를 닫고 획득한 모든 리소스를 해제
+        presigner.close(); // presigner를 닫고 획득한 모든 리소스를 해제
         return url;
     }
 
