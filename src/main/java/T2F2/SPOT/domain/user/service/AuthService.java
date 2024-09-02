@@ -40,4 +40,8 @@ public class AuthService {
             throw new UserExceptions.SignUpFailedException("Error while signing up");
         }
     }
+
+    public User findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }

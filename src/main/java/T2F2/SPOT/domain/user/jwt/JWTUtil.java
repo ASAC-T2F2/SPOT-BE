@@ -1,14 +1,18 @@
 package T2F2.SPOT.domain.user.jwt;
 
 import T2F2.SPOT.domain.user.Role;
+import T2F2.SPOT.domain.user.entity.User;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
 
 @Component
@@ -55,5 +59,4 @@ public class JWTUtil {
                 .signWith(secretKey)
                 .compact();
     }
-
 }

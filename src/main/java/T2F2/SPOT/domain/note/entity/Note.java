@@ -18,10 +18,6 @@ public class Note extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "note_room_id")
-    private NoteRoom noteRoom;
-
     private String noteContent;
 
     // 작성일
@@ -30,6 +26,10 @@ public class Note extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private User sender;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "note_room_id")
+    private NoteRoom noteRoom;
 
     @Builder
     public Note(String noteContent, User sender, NoteRoom noteRoom) {

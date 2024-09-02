@@ -1,8 +1,6 @@
 package T2F2.SPOT.domain.user.entity;
 
 import T2F2.SPOT.domain.grade.entity.Grade;
-import T2F2.SPOT.domain.note.entity.Note;
-import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.user.Role;

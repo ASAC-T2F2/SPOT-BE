@@ -31,6 +31,10 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    public Post getPostById(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+    }
+
     public void createPost(CreatePostDto createPostDto) {
         User findUser = userRepository.findById(createPostDto.getUserId()).orElseThrow();
         Post result = postRepository.save(Post.of(createPostDto, findUser));
