@@ -67,8 +67,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "/auth/join", "/email/**", "/api/**", "/aws/**", "/note/**", "/noteRoom/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/login", "/", "/auth/join", "/email/**", "/api/**").permitAll()
-                        .requestMatchers("/admin").hasAuthority("ADMIN")
                         .requestMatchers("/wish/add", "/wish/cancel").hasAuthority("USER")
                         .requestMatchers("/review/**").hasAuthority("USER")
                         .requestMatchers("/user/**").hasAuthority("USER")

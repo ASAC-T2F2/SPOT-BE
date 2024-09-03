@@ -1,5 +1,6 @@
 package T2F2.SPOT.config;
 
+import T2F2.SPOT.domain.note.websocket.CustomHandshakeInterceptor;
 import T2F2.SPOT.domain.note.websocket.WebSocketAuthInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -14,9 +15,11 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketAuthInterceptor webSocketAuthInterceptor;
+    private final CustomHandshakeInterceptor customHandshakeInterceptor;
 
-    public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor) {
+    public WebSocketConfig(WebSocketAuthInterceptor webSocketAuthInterceptor, CustomHandshakeInterceptor customHandshakeInterceptor) {
         this.webSocketAuthInterceptor = webSocketAuthInterceptor;
+        this.customHandshakeInterceptor = customHandshakeInterceptor;
     }
 
     @Override
@@ -24,7 +27,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.addEndpoint("/note")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(new HttpSessionHandshakeInterceptor());
+                .addInterceptors(customHandshakeInterceptor);
+//                .addInterceptors(webSocketAuthInterceptor);
 //                .withSockJS(); // 웹소켓이 지원되지 않는 환경에서도 실시간 양방향 통신 가능
     }
 
@@ -40,4 +44,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(webSocketAuthInterceptor);
     }
+
 }
