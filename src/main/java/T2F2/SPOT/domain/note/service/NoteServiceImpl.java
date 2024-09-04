@@ -25,14 +25,14 @@ public class NoteServiceImpl {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
 
-    public NoteResponse sendNote(Long roomId, String senderNickname, NoteRequest noteRequest) {
+    public NoteResponse sendNote(Long roomId, String senderEmail, NoteRequest noteRequest) {
 
         NoteRoom room = noteRoomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("NoteRoom not found"));
 
-        User sender = userRepository.findByNickname(senderNickname)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
+        User sender = userRepository.findByEmail(senderEmail);
 
+        log.info("Sender email: " + senderEmail, sender.getNickname());
         Note newNote = Note.createNote(noteRequest.getNoteContent(), sender, room);
         Note savedNote = noteRepository.save(newNote);
         log.info("Saved new note with ID: {}", savedNote.getId());

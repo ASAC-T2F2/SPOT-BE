@@ -7,18 +7,14 @@ import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.broker.SimpleBrokerMessageHandler;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-
-import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -29,19 +25,24 @@ public class NoteController {
 
     @MessageMapping("/room/{noteRoomId}")
     @SendTo("/sub/room/{noteRoomId}")
-    public NoteResponse sendNote(@DestinationVariable("noteRoomId") Long noteRoomId,
-                                 NoteRequest noteRequest) {
+    public NoteResponse sendNote(@DestinationVariable Long noteRoomId,
+                                 @Payload NoteRequest noteRequest,
+                                 SimpMessageHeaderAccessor accessor) {
 
-        // 인증된 사용자 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            throw new RuntimeException("User is not authenticated.");
-        }
+        String email = (String) accessor.getSessionAttributes().get("senderEmail");
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = customUserDetails.getUser();
-        log.info("user information: {}", user.getNickname());
+        log.info("이메일 찾기: {}", email);
+        return noteService.sendNote(noteRoomId, email, noteRequest);
 
-        return noteService.sendNote(noteRoomId, user.getNickname(), noteRequest);
+//        // 인증된 사용자 가져오기
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+//            throw new RuntimeException("User is not authenticated.");
+//        }
+//
+//        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+//        User user = customUserDetails.getUser();
+//        log.info("user information: {}", user.getNickname());
+
     }
 }
