@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -62,15 +63,14 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
 
+        http
+                .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()));
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/login", "/", "/auth/join", "/email/**", "/api/**", "/aws/**", "/note/**", "/noteRoom/**").permitAll()
+                        .requestMatchers("/login", "/","/swagger-ui/**", "/v3/api-docs/**", "/auth/join","/token/reissue", "/email/**", "/aws/**", "/note/**", "/noteRoom/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/wish/add", "/wish/cancel").hasAuthority("USER")
-                        .requestMatchers("/review/**").hasAuthority("USER")
-                        .requestMatchers("/user/**").hasAuthority("USER")
-                        .requestMatchers("/token/reissue").permitAll()
+                        .requestMatchers("/api/**").hasAuthority( "USER")
                         .anyRequest().authenticated());
 
         http
