@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.note.dto;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

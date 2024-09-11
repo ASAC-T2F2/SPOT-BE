@@ -1,11 +1,6 @@
 package T2F2.SPOT.domain.note.websocket;
 
-import T2F2.SPOT.domain.user.Role;
-import T2F2.SPOT.domain.user.dto.CustomUserDetails;
-import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.TokenException;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +11,8 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
-import org.springframework.web.socket.server.HandshakeInterceptor;
-
-import java.util.List;
 
 @Slf4j
 @Component
