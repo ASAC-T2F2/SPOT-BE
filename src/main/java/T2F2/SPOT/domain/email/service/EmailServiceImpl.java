@@ -2,6 +2,7 @@ package T2F2.SPOT.domain.email.service;
 
 import T2F2.SPOT.domain.email.dto.EmailDto;
 import T2F2.SPOT.domain.email.entity.Email;
+import T2F2.SPOT.domain.email.exception.EmailException;
 import T2F2.SPOT.domain.email.repository.EmailRepository;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
@@ -71,8 +72,9 @@ public class EmailServiceImpl implements EmailService{
     // 이메일과 인증코드 저장하는 메서드
     private void saveEmailCode(EmailDto emailDto) {
         Email email = Email.builder()
-                .email(emailDto.getMail())
+                .email(emailDto.getEmail())
                 .verifyCode(emailDto.getVerifyCode())
+                .emailStatus(false)
                 .build();
         emailRepository.save(email);
     }
@@ -106,27 +108,56 @@ public class EmailServiceImpl implements EmailService{
     /**
      * 인증코드를 검증하는 메서드
      * 저장 후 3분내로 검증요청
-     * @param mail(검증시도하는 메일)
+     * @param email(검증시도하는 메일)
      * @param code(검증시도하는 인증코드)
      * @return
      */
     @Override
-    public String verifyCode(String mail, String code) {
-        Email email = emailRepository.findByEmail(mail).orElseThrow();
-        LocalDateTime vaildTime = email.getCreatedDate().plusMinutes(3);
+    public Boolean verifyCode(String email, String code) {
+        try {
+            Email mail = emailRepository.findByEmail(email).orElseThrow(() ->
+                    new IllegalArgumentException("Email(" + email + ") not found"));
 
-        if(LocalDateTime.now().isAfter(vaildTime)) {
-            log.info("인증시간 만료");
-            return "Authentication time has expired";
-        }
+            LocalDateTime validTime = mail.getCreatedDate().plusMinutes(1);
 
-        if(email.getVerifyCode().equals(code)) {
-            log.info("인증이 완료되었습니다");
-            email.modifyEmailStatus(email.getVerifyCode().equals(code));
-            return "Authentication has been completed";
-        } else {
-            log.info("인증에 실패하셨습니다");
-            return "Authentication failed";
+            // 인증 시간 만료 검사
+            if (LocalDateTime.now().isAfter(validTime)) {
+                log.info("인증시간 만료");
+                throw new EmailException.ExpiredVerificationCodeException("Verification time expired");
+            }
+
+            // 인증 코드 일치 검사
+            if (mail.getVerifyCode().equals(code)) {
+                log.info("인증 완료");
+                mail.modifyEmailStatus(true);
+                emailRepository.save(mail);
+                return true;
+            } else {
+                log.info("인증에 실패하셨습니다");
+                throw new EmailException.InvalidVerificationCodeException("Invalid verification code");
+            }
+        } catch (EmailException.ExpiredVerificationCodeException e) {
+            log.error("인증 시간 만료: {}", e.getMessage());
+            throw e;
+        } catch (EmailException.InvalidVerificationCodeException e) {
+            log.error("잘못된 인증 코드: {}", e.getMessage());
+            throw e; // 필요 시 재처리
         }
+//        Email mail = emailRepository.findByEmail(email).orElseThrow();
+//        LocalDateTime vaildTime = mail.getCreatedDate().plusMinutes(3);
+//
+//        if(LocalDateTime.now().isAfter(vaildTime)) {
+//            log.info("인증시간 만료");
+//            throw new
+//        }
+//
+//        if(mail.getVerifyCode().equals(code)) {
+//            log.info("인증이 완료되었습니다");
+//            mail.modifyEmailStatus(mail.getVerifyCode().equals(code));
+//            return true;
+//        } else {
+//            log.info("인증에 실패하셨습니다");
+//            return "Authentication failed";
+//        }
     }
 }

@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.email.controller;
 
 import T2F2.SPOT.domain.email.dto.EmailDto;
+import T2F2.SPOT.domain.email.exception.EmailException;
 import T2F2.SPOT.domain.email.service.EmailService;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import lombok.RequiredArgsConstructor;
@@ -20,17 +21,23 @@ public class EmailController {
     @PostMapping("/verification-request")
     public ResponseEntity<String> sendMessage(@Validated @RequestBody EmailDto emailDto) {
         try {
-            emailService.sendEmail(emailDto.getMail());
+            emailService.sendEmail(emailDto.getEmail());
             return ResponseEntity.ok("Successfully sent");
         } catch (UserExceptions.EmailAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
     }
 
-    @GetMapping("/verification")
+    @PostMapping("/verification")
     public ResponseEntity<String> verificationEmail(@Validated @RequestBody EmailDto emailDto) {
-        emailService.verifyCode(emailDto.getMail(), emailDto.getVerifyCode());
+        try {
+            emailService.verifyCode(emailDto.getEmail(), emailDto.getVerifyCode());
+            return ResponseEntity.ok("Successfully verification");
+        } catch (EmailException.InvalidVerificationCodeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid verification code");
+        } catch (EmailException.ExpiredVerificationCodeException e) {
+            return ResponseEntity.status(HttpStatus.GONE).body("Expired verification code");
+        }
 
-        return ResponseEntity.ok("Successfully verification");
     }
 }

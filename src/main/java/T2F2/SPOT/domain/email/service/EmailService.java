@@ -9,5 +9,5 @@ public interface EmailService {
 
     EmailDto createEmailForm(String email);
 
-    String verifyCode(String mail, String code);
+    Boolean verifyCode(String email, String code);
 }
