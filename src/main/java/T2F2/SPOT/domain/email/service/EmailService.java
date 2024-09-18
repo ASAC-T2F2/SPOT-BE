@@ -4,6 +4,7 @@ import T2F2.SPOT.domain.email.dto.EmailDto;
 
 public interface EmailService {
 
+    String createCode();
 
     void sendEmail(String email);
 

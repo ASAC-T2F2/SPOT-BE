@@ -28,7 +28,8 @@ public class EmailServiceImpl implements EmailService{
     private final UserRepository userRepository;
 
     //랜덤한 6자리의 문자열 코드 생성
-    private String createCode() {
+    @Override
+    public String createCode() {
         int leftLimit = 48; // number '0'
         int rightLimit = 122; // alphabet 'z'
         int targetStringLength = 6;
