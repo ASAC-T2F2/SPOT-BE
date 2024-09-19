@@ -10,6 +10,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class AuthService {
      * @param joinDTO
      * @return 회원가입 성공여부
      */
+    @Transactional
     public Boolean signUp(JoinDTO joinDTO) {
         String nickname = joinDTO.getNickname();
 
@@ -54,6 +56,15 @@ public class AuthService {
         } catch (Exception e) {
             throw new UserExceptions.SignUpFailedException("Error while signing up");
         }
+    }
+
+    public boolean nicknameCheck(String nickname) {
+        Boolean isExistNickname = userRepository.existsByNickname(nickname);
+
+        if(isExistNickname){
+            throw new UserExceptions.NicknameAlreadyExistsException("Nickname(" + nickname + ") already exists");
+        }
+        return true;
     }
 
     /**
@@ -109,6 +120,7 @@ public class AuthService {
         return message;
     }
 
+    @Transactional
     public void changePassword(String email, String code, String newPassword) {
         String storedCode = verificationCodes.get(email);
 

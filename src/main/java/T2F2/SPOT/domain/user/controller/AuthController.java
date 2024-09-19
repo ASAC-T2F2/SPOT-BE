@@ -35,6 +35,19 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/nicknameCheck")
+    public ResponseEntity<String> nicknameCheck(@RequestBody Map<String, String> requestBody) {
+
+        String nickname = requestBody.get("nickname");
+
+        try {
+            authService.nicknameCheck(nickname);
+            return ResponseEntity.ok(nickname + " can join");
+        } catch (UserExceptions.NicknameAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/findPassword")
     public ResponseEntity<String> findPassword(@RequestBody Map<String, String> requestBody) {
 

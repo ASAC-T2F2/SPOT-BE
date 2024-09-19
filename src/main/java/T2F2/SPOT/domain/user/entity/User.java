@@ -29,7 +29,10 @@ public class User extends BaseEntity {
 
     private String email;
     private String password;
+
+    @Column(unique = true)
     private String nickname;
+
     private String university;
     private String major;
     private String entranceYear;
