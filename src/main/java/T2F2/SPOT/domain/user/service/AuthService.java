@@ -2,6 +2,7 @@ package T2F2.SPOT.domain.user.service;
 
 import T2F2.SPOT.domain.email.service.EmailService;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
+import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
@@ -12,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -121,7 +121,11 @@ public class AuthService {
     }
 
     @Transactional
-    public void changePassword(String email, String code, String newPassword) {
+    public void changePassword(PasswordDTO passwordDTO) {
+        String email = passwordDTO.getEmail();
+        String code = passwordDTO.getCode();
+        String newPassword = passwordDTO.getNewPassword();
+
         String storedCode = verificationCodes.get(email);
 
         if(storedCode == null || !storedCode.equals(code)) {
@@ -129,9 +133,15 @@ public class AuthService {
         }
 
         User user = userRepository.findByEmail(email);
+
         if(user == null) {
             throw new UserExceptions.UserNotFoundException(email + "User not found");
         }
+
+        if(bCryptPasswordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("기존 비밀번호와 동일합니다.");
+        }
+
         user.changePassword(newPassword, bCryptPasswordEncoder);
         userRepository.save(user);
 

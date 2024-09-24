@@ -1,5 +1,6 @@
 package T2F2.SPOT.domain.user.controller;
 
+import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.service.AuthService;
@@ -63,13 +64,10 @@ public class AuthController {
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<String> changePassword(@RequestBody Map<String, String> requestBody) {
-        String email = requestBody.get("email");
-        String code = requestBody.get("code");
-        String newPassword = requestBody.get("newPassword");
+    public ResponseEntity<String> changePassword(@RequestBody PasswordDTO passwordDTO) {
 
         try {
-            authService.changePassword(email, code, newPassword);
+            authService.changePassword(passwordDTO);
             return ResponseEntity.ok("Successfully change password");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
