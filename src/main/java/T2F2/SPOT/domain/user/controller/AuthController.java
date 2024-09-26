@@ -1,5 +1,6 @@
 package T2F2.SPOT.domain.user.controller;
 
+import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.service.AuthService;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -31,5 +34,46 @@ public class AuthController {
         } catch (UserExceptions.UserSignUpException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/nicknameCheck")
+    public ResponseEntity<String> nicknameCheck(@RequestBody Map<String, String> requestBody) {
+
+        String nickname = requestBody.get("nickname");
+
+        try {
+            authService.nicknameCheck(nickname);
+            return ResponseEntity.ok(nickname + " can join");
+        } catch (UserExceptions.NicknameAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/findPassword")
+    public ResponseEntity<String> findPassword(@RequestBody Map<String, String> requestBody) {
+
+        String email = requestBody.get("email");
+
+        try {
+            authService.sendNewPasswordCode(email);
+            requestBody.remove("email");
+            return ResponseEntity.ok("Successfully sent find password code");
+        } catch (UserExceptions.UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseEntity<String> changePassword(@RequestBody PasswordDTO passwordDTO) {
+
+        try {
+            authService.changePassword(passwordDTO);
+            return ResponseEntity.ok("Successfully change password");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (UserExceptions.UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+
     }
 }
