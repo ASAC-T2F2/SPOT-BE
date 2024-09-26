@@ -1,7 +1,5 @@
 package T2F2.SPOT.domain.user.entity;
 
-import T2F2.SPOT.domain.note.entity.Note;
-import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.review.entity.Review;
@@ -11,6 +9,7 @@ import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,10 @@ public class User extends BaseEntity {
 
     private String email;
     private String password;
+
+    @Column(unique = true)
     private String nickname;
+
     private String university;
     private String major;
     private String entranceYear;
@@ -61,11 +63,17 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<Note> notes = new ArrayList<>();
+//    @OneToMany(mappedBy = "sender")
+//    private List<Note> notes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
-    private List<NoteRoom> noteRooms = new ArrayList<>();
+//    @OneToMany(mappedBy = "user")
+//    private List<NoteRoom> noteRooms = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "sender")
+//    private List<NoteRoom> sentNoteRooms = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "receiver")
+//    private List<NoteRoom> receivedNoteRooms = new ArrayList<>();
 
     /* 매너온도 업데이트 관련 로직*/
     /**
@@ -112,6 +120,10 @@ public class User extends BaseEntity {
             this.grade = Grade.evaluateGrade(this);
         }
         return this.grade;
+    }
+
+    public void changePassword(String newPassword, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.password = bCryptPasswordEncoder.encode(newPassword);
     }
 }
 
