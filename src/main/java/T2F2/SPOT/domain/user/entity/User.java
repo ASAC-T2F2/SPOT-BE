@@ -1,7 +1,5 @@
 package T2F2.SPOT.domain.user.entity;
 
-import T2F2.SPOT.domain.note.entity.Note;
-import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.review.entity.Review;
@@ -11,6 +9,7 @@ import T2F2.SPOT.domain.wish.entity.Wish;
 import T2F2.SPOT.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,10 @@ public class User extends BaseEntity {
 
     private String email;
     private String password;
+
+    @Column(unique = true)
     private String nickname;
+
     private String university;
     private String major;
     private String entranceYear;
@@ -118,6 +120,10 @@ public class User extends BaseEntity {
             this.grade = Grade.evaluateGrade(this);
         }
         return this.grade;
+    }
+
+    public void changePassword(String newPassword, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.password = bCryptPasswordEncoder.encode(newPassword);
     }
 }
 
