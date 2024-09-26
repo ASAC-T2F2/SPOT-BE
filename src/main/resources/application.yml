@@ -58,3 +58,23 @@ logging:
     org.hibernate.SQL: debug
     org.springframework.security: debug
 #    org.hibernate.orm.jdbc.bind: trace
+
+springdoc:
+  swagger-ui:
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    display-request-duration: true
+    default-model-expand-depth: 2
+    default-models-expand-depth: 2
+
+  api-docs:
+    path: /v3/api-docs
+
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+  model-and-view-allowed: true
+  paths-to-match:
+    - /api/**
