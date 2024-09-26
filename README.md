@@ -47,7 +47,7 @@
   **→ SPOT**은 대학생들과 관련된 물건만 거래할 수 있어 거래 아이템의 관련성을 높일 수 있습니다.
 
 > ### 프로젝트 구조
-
+<img src="https://raw.githubusercontent.com/ASAC-T2F2/SPOT-BE/refs/heads/doc/readme/src/main/resources/%E1%84%87%E1%85%A2%E1%84%91%E1%85%A9%20%E1%84%8D%E1%85%B5%E1%86%AB%E1%84%86%E1%85%A1%E1%86%A8.drawio%20(1).png">
 > ### 기술 스택
 - **Backend**
   - Spring Boot
