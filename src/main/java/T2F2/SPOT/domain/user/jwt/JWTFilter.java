@@ -31,7 +31,7 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JWT Filter----------------------------");
-        String accessToken = request.getHeader("access");
+        String accessToken = request.getHeader("Authorization");
         log.info("Received Access token: {}", accessToken);
 
         if (accessToken != null && accessToken.startsWith("Bearer ")) {
