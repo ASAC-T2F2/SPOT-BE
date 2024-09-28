@@ -126,16 +126,16 @@ public class AuthService {
         String code = passwordDTO.getCode();
         String newPassword = passwordDTO.getNewPassword();
 
+        User user = userRepository.findByEmail(email);
+
+        if(user == null) {
+            throw new UserExceptions.UserNotFoundException(email + " User not found");
+        }
+
         String storedCode = verificationCodes.get(email);
 
         if(storedCode == null || !storedCode.equals(code)) {
             throw new IllegalArgumentException("인증 코드가 일치하지 않습니다.");
-        }
-
-        User user = userRepository.findByEmail(email);
-
-        if(user == null) {
-            throw new UserExceptions.UserNotFoundException(email + "User not found");
         }
 
         if(bCryptPasswordEncoder.matches(newPassword, user.getPassword())) {
