@@ -120,22 +120,32 @@ public class AuthService {
         return message;
     }
 
+    /**
+     *  비밀번호 변경을 위한 인증 코드 확인 로직
+     * @param email
+     * @param code
+     */
+    public void verificationCode(String email, String code) {
+
+        String storedCode = verificationCodes.get(email);
+        if(storedCode == null || !storedCode.equals(code)) {
+            throw new IllegalArgumentException(code + " is not correct");
+        }
+    }
+
+    /**
+     * 비밀번호 변경 로직
+     * @param passwordDTO
+     */
     @Transactional
     public void changePassword(PasswordDTO passwordDTO) {
         String email = passwordDTO.getEmail();
-        String code = passwordDTO.getCode();
         String newPassword = passwordDTO.getNewPassword();
 
         User user = userRepository.findByEmail(email);
 
         if(user == null) {
             throw new UserExceptions.UserNotFoundException(email + " User not found");
-        }
-
-        String storedCode = verificationCodes.get(email);
-
-        if(storedCode == null || !storedCode.equals(code)) {
-            throw new IllegalArgumentException("인증 코드가 일치하지 않습니다.");
         }
 
         if(bCryptPasswordEncoder.matches(newPassword, user.getPassword())) {

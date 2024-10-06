@@ -63,6 +63,16 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/verification")
+    public ResponseEntity<String> verification(@RequestBody PasswordDTO passwordDTO) {
+        try {
+            authService.verificationCode(passwordDTO.getEmail(), passwordDTO.getCode());
+            return ResponseEntity.ok("Successfully verified");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestBody PasswordDTO passwordDTO) {
 
