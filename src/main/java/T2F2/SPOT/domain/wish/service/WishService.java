@@ -10,6 +10,10 @@
     import T2F2.SPOT.domain.wish.entity.Wish;
     import T2F2.SPOT.domain.wish.exception.WishException;
     import T2F2.SPOT.domain.wish.repository.WishRepository;
+    import T2F2.SPOT.util.exception.CustomException;
+    import T2F2.SPOT.util.exception.error_code.PostErrorCode;
+    import T2F2.SPOT.util.exception.error_code.UserErrorCode;
+    import T2F2.SPOT.util.exception.error_code.WishErrorCode;
     import jakarta.transaction.Transactional;
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.stereotype.Service;
@@ -42,7 +46,7 @@
             // 사용자 확인
             User user = userRepository.findByEmail(username);
             if (user == null) {
-                throw new UserExceptions.UserNotFoundException("User not found: " + username);
+                throw new CustomException(UserErrorCode.NOT_FOUND);
             }
             log.info("[AddWish] - User: {}", user.getEmail());
 
@@ -71,7 +75,7 @@
             Long targetPostId = cancelWishRequest.getTargetPostId();
 
             Wish wish = wishRepository.findByPostIdAndUserEmail(targetPostId, username)
-                            .orElseThrow(() -> new WishException.WishNotFoundException("Wish not found for target post: " + targetPostId + ", username: " + username));
+                            .orElseThrow(() -> new CustomException(WishErrorCode.NOT_FOUND));
 
             wishRepository.delete(wish);
 
@@ -82,7 +86,7 @@
         public List<PreviewWishResponse> findAllWish(String userEmail) {
 
             List<Wish> wishes = wishRepository.findAllByUserEmailWithPost(userEmail)
-                    .orElseThrow(() -> new WishException.WishNotFoundException("Wish Not Found: " + userEmail));
+                    .orElseThrow(() -> new CustomException(WishErrorCode.NOT_FOUND));
 
             log.info("[FindAllWish] - Wishes: {}", wishes);
 
@@ -101,6 +105,6 @@
          */
         private Post getPostById(Long postId) {
             return postRepository.findById(postId)
-                    .orElseThrow(() -> new PostException.PostNotFoundException("Post not found: " + postId));
+                    .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
         }
     }

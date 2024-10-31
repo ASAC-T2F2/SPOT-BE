@@ -43,25 +43,17 @@ public class WishController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public ResponseEntity<?> addWish(@RequestBody AddWishRequest addWishRequest) {
-        try {
-            // 현재 인증된 사용자 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            AddWishResponse response = wishService.addWish(addWishRequest, userEmail);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-
-        } catch (UserExceptions.UserNotFoundException | PostException.PostNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("Error while adding wish", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        // 현재 인증된 사용자 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        AddWishResponse response = wishService.addWish(addWishRequest, userEmail);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 
@@ -75,22 +67,17 @@ public class WishController {
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelWish(@RequestBody CancelWishRequest cancelWishRequest) {
 
-        try {
-            // 현재 인증된 사용자 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            CancelWishResponse cancelWishResponse = wishService.cancelWish(cancelWishRequest, userEmail);
-            return new ResponseEntity<>(cancelWishResponse, HttpStatus.OK);
-        } catch (WishException.WishNotFoundException e) {
-            log.error("Error while canceling wish", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        // 현재 인증된 사용자 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        CancelWishResponse cancelWishResponse = wishService.cancelWish(cancelWishRequest, userEmail);
+        return new ResponseEntity<>(cancelWishResponse, HttpStatus.OK);
     }
 
 
@@ -103,21 +90,16 @@ public class WishController {
     })
     @GetMapping("/wishes")
     public ResponseEntity<?> getWishes() {
-        try {
-            // 현재 인증된 사용자 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            List<PreviewWishResponse> wishes = wishService.findAllWish(userEmail);
-            return new ResponseEntity<>(wishes, HttpStatus.OK);
-        } catch (UserExceptions.UserNotFoundException | WishException.WishNotFoundException e) {
-            log.error("Error while getting wishes", e);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        // 현재 인증된 사용자 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        List<PreviewWishResponse> wishes = wishService.findAllWish(userEmail);
+        return new ResponseEntity<>(wishes, HttpStatus.OK);
     }
 }
