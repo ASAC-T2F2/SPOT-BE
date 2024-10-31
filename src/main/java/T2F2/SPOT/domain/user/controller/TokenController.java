@@ -26,11 +26,7 @@ public class TokenController {
     @PostMapping("/reissue")
     public ResponseEntity<?> reissueToken(HttpServletRequest request, HttpServletResponse response) {
 
-        try {
-            String newAccessToken = tokenService.reissueToken(request, response);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (TokenException.RefreshTokenIsNullException | TokenException.RefreshTokenExpiredException | TokenException.InvalidTokenCategory | TokenException.InvalidRefreshToken e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        String newAccessToken = tokenService.reissueToken(request, response);
+        return ResponseEntity.ok("토큰 재발급 성공");
     }
 }
