@@ -5,6 +5,8 @@ import T2F2.SPOT.domain.user.dto.profile.UserProfileResponse;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,7 @@ public class UserService {
         User user = userRepository.findByEmail(userEmail);
 
         if (user == null) {
-            throw new UserExceptions.UserNotFoundException(userEmail);
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         }
 
         log.info("[User Service] - Found User: {}", user.getEmail());
@@ -38,7 +40,7 @@ public class UserService {
 
     public UserProfileResponse getUserProfile(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new UserExceptions.UserNotFoundException("대상을 찾을 수 없습니다.")
+                () -> new CustomException(UserErrorCode.NOT_FOUND)
         );
 
         log.info("[User Service] - Found User: {}", user.getEmail());
