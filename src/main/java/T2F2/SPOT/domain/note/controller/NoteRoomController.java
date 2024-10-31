@@ -43,21 +43,17 @@ public class NoteRoomController {
 
     @DeleteMapping("/deleteRoom/{roomId}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
-        try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            noteRoomService.deleteRoom(roomId, userEmail);
-
-            return new ResponseEntity<>("Room deleted successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        noteRoomService.deleteRoom(roomId, userEmail);
+
+        return new ResponseEntity<>("채팅방 삭제 성공", HttpStatus.OK);
     }
 //
 //    //게시글의 채팅방 조회?
@@ -71,23 +67,17 @@ public class NoteRoomController {
     //채팅방 개설
     @PostMapping("/createRoom")
     public ResponseEntity<?> createRoom(@RequestBody NoteRoomRequestDto noteRoomRequestDto) {
-        try {
-
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto, userEmail);
-            log.info("Create Note Room, Post ID: {}, Sender: {}, Receiver: {}", responseDto.getPostId(), responseDto.getOwner(), responseDto.getGuest());
-            return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
-
-        } catch (UserExceptions.UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto, userEmail);
+        log.info("Create Note Room, Post ID: {}, Sender: {}, Receiver: {}", responseDto.getPostId(), responseDto.getOwner(), responseDto.getGuest());
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
 }
