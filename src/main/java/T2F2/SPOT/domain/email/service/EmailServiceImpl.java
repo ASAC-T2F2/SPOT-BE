@@ -119,7 +119,7 @@ public class EmailServiceImpl implements EmailService{
     @Override
     public Boolean verifyCode(String email, String code) {
         Email mail = emailRepository.findByEmail(email).orElseThrow(() ->
-                new IllegalArgumentException("Email(" + email + ") not found"));
+                new CustomException(EmailErrorCode.NOT_FOUND));
 
         LocalDateTime validTime = mail.getCreatedDate().plusMinutes(1);
 
