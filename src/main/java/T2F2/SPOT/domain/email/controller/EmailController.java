@@ -20,24 +20,13 @@ public class EmailController {
 
     @PostMapping("/verification-request")
     public ResponseEntity<String> sendMessage(@Validated @RequestBody EmailDto emailDto) {
-        try {
-            emailService.sendEmail(emailDto.getEmail());
-            return ResponseEntity.ok("Successfully sent");
-        } catch (UserExceptions.EmailAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        emailService.sendEmail(emailDto.getEmail());
+        return ResponseEntity.ok("이메일 전송 성공");
     }
 
     @PostMapping("/verification")
     public ResponseEntity<String> verificationEmail(@Validated @RequestBody EmailDto emailDto) {
-        try {
-            emailService.verifyCode(emailDto.getEmail(), emailDto.getVerifyCode());
-            return ResponseEntity.ok("Successfully verification");
-        } catch (EmailException.InvalidVerificationCodeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid verification code");
-        } catch (EmailException.ExpiredVerificationCodeException e) {
-            return ResponseEntity.status(HttpStatus.GONE).body("Expired verification code");
-        }
-
+        emailService.verifyCode(emailDto.getEmail(), emailDto.getVerifyCode());
+        return ResponseEntity.ok("이메일 인증 성공");
     }
 }

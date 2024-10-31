@@ -6,6 +6,9 @@ import T2F2.SPOT.domain.email.exception.EmailException;
 import T2F2.SPOT.domain.email.repository.EmailRepository;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.EmailErrorCode;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +56,7 @@ public class EmailServiceImpl implements EmailService{
         Boolean isExistUser = userRepository.existsByEmail(email);
 
         if (isExistUser) {
-            throw new UserExceptions.EmailAlreadyExistsException("Email(" + email + ") already exists");
+            throw new CustomException(UserErrorCode.EMAIL_ALREADY_EXIST);
         } else {
             Optional<Email> findEmail = emailRepository.findByEmail(email);
             if(findEmail.isPresent()) {
@@ -65,7 +68,7 @@ public class EmailServiceImpl implements EmailService{
                 saveEmailCode(emailForm);
             } catch (RuntimeException e) {
                 log.error("Failed to send email to {}: {}", email, e.getMessage());
-                throw new RuntimeException("Failed to send email", e);
+                throw new CustomException(EmailErrorCode.SEND_FAILED);
             }
         }
     }
@@ -115,50 +118,26 @@ public class EmailServiceImpl implements EmailService{
      */
     @Override
     public Boolean verifyCode(String email, String code) {
-        try {
-            Email mail = emailRepository.findByEmail(email).orElseThrow(() ->
-                    new IllegalArgumentException("Email(" + email + ") not found"));
+        Email mail = emailRepository.findByEmail(email).orElseThrow(() ->
+                new IllegalArgumentException("Email(" + email + ") not found"));
 
-            LocalDateTime validTime = mail.getCreatedDate().plusMinutes(1);
+        LocalDateTime validTime = mail.getCreatedDate().plusMinutes(1);
 
-            // 인증 시간 만료 검사
-            if (LocalDateTime.now().isAfter(validTime)) {
-                log.info("인증시간 만료");
-                throw new EmailException.ExpiredVerificationCodeException("Verification time expired");
-            }
-
-            // 인증 코드 일치 검사
-            if (mail.getVerifyCode().equals(code)) {
-                log.info("인증 완료");
-                mail.modifyEmailStatus(true);
-                emailRepository.save(mail);
-                return true;
-            } else {
-                log.info("인증에 실패하셨습니다");
-                throw new EmailException.InvalidVerificationCodeException("Invalid verification code");
-            }
-        } catch (EmailException.ExpiredVerificationCodeException e) {
-            log.error("인증 시간 만료: {}", e.getMessage());
-            throw e;
-        } catch (EmailException.InvalidVerificationCodeException e) {
-            log.error("잘못된 인증 코드: {}", e.getMessage());
-            throw e; // 필요 시 재처리
+        // 인증 시간 만료 검사
+        if (LocalDateTime.now().isAfter(validTime)) {
+            log.info("인증시간 만료");
+            throw new CustomException(EmailErrorCode.EXPIRED_VERIFICATION_CODE);
         }
-//        Email mail = emailRepository.findByEmail(email).orElseThrow();
-//        LocalDateTime vaildTime = mail.getCreatedDate().plusMinutes(3);
-//
-//        if(LocalDateTime.now().isAfter(vaildTime)) {
-//            log.info("인증시간 만료");
-//            throw new
-//        }
-//
-//        if(mail.getVerifyCode().equals(code)) {
-//            log.info("인증이 완료되었습니다");
-//            mail.modifyEmailStatus(mail.getVerifyCode().equals(code));
-//            return true;
-//        } else {
-//            log.info("인증에 실패하셨습니다");
-//            return "Authentication failed";
-//        }
+
+        // 인증 코드 일치 검사
+        if (mail.getVerifyCode().equals(code)) {
+            log.info("인증 완료");
+            mail.modifyEmailStatus(true);
+            emailRepository.save(mail);
+            return true;
+        } else {
+            log.info("인증에 실패하셨습니다");
+            throw new CustomException(EmailErrorCode.INVALID_VERIFICATION_CODE);
+        }
     }
 }
