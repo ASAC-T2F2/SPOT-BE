@@ -26,27 +26,16 @@ public class AuthController {
     @PostMapping("/join")
     public ResponseEntity<String> join(@RequestBody JoinDTO joinDTO) {
 
-        try {
-            authService.signUp(joinDTO);
-            return ResponseEntity.ok("Successfully joined");
-        } catch (UserExceptions.NicknameAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (UserExceptions.UserSignUpException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        authService.signUp(joinDTO);
+        return ResponseEntity.ok("회원가입 성공");
     }
 
     @PostMapping("/nicknameCheck")
     public ResponseEntity<String> nicknameCheck(@RequestBody Map<String, String> requestBody) {
 
         String nickname = requestBody.get("nickname");
-
-        try {
-            authService.nicknameCheck(nickname);
-            return ResponseEntity.ok(nickname + " can join");
-        } catch (UserExceptions.NicknameAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        authService.nicknameCheck(nickname);
+        return ResponseEntity.ok(nickname + "은(는) 사용가능한 닉네임입니다.");
     }
 
     @PostMapping("/findPassword")
@@ -54,36 +43,23 @@ public class AuthController {
 
         String email = requestBody.get("email");
 
-        try {
-            authService.sendNewPasswordCode(email);
-            requestBody.remove("email");
-            return ResponseEntity.ok("Successfully sent find password code");
-        } catch (UserExceptions.UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        authService.sendNewPasswordCode(email);
+        requestBody.remove("email");
+
+        return ResponseEntity.ok("비밀번호 변경코드 전송 완료");
     }
 
     @PostMapping("/verification")
     public ResponseEntity<String> verification(@RequestBody PasswordDTO passwordDTO) {
-        try {
-            authService.verificationCode(passwordDTO.getEmail(), passwordDTO.getCode());
-            return ResponseEntity.ok("Successfully verified");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+
+        authService.verificationCode(passwordDTO.getEmail(), passwordDTO.getCode());
+        return ResponseEntity.ok("이메일 인증 성공");
     }
 
     @PostMapping("/changePassword")
     public ResponseEntity<String> changePassword(@RequestBody PasswordDTO passwordDTO) {
 
-        try {
-            authService.changePassword(passwordDTO);
-            return ResponseEntity.ok("Successfully change password");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (UserExceptions.UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-
+        authService.changePassword(passwordDTO);
+        return ResponseEntity.ok("비밀번호 변경 성공");
     }
 }
