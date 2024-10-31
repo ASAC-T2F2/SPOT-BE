@@ -11,6 +11,10 @@ import T2F2.SPOT.domain.review.repository.ReviewRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.PostErrorCode;
+import T2F2.SPOT.util.exception.error_code.ReviewErrorCode;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,12 +39,12 @@ public class ReviewService {
 
         User sender = userRepository.findByEmail(username);
         User receiver = userRepository.findById(createReviewRequest.getReceiverId())
-                .orElseThrow(() -> new UserExceptions.UserNotFoundException("리뷰 대상을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         log.info("리뷰 작성자 : {}", sender.getId());
         log.info("리뷰 대상 : {}", receiver.getId());
 
         Post targetPost = postRepository.findById(createReviewRequest.getPostId())
-                .orElseThrow(() -> new PostException.PostNotFoundException("리뷰 대상 게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
         log.info("리뷰 대상 게시글 : {}", targetPost.getId());
 
         checkReviewExistence(sender, receiver, targetPost);
@@ -52,9 +56,6 @@ public class ReviewService {
         float updatedMannerScore = receiver.updateMannerScore(createReviewRequest.getRate());
         log.info("[Review Service]- Before updateMannerScore, reviewRate: {}", reviewRate);
         log.info("[Review Service]- After updateMannerScore, receiver's mannerScore: {}", updatedMannerScore);
-
-        /* 리뷰대상 등급 관련 로직 */
-
 
         ReviewResponse reviewResponse = ReviewResponse.from(review);
         reviewRepository.save(review);
@@ -70,7 +71,7 @@ public class ReviewService {
      */
     private void checkReviewExistence(User sender, User receiver, Post targetPost) {
         if (reviewRepository.existsBySenderAndReceiverAndPost(sender, receiver, targetPost)) {
-            throw new ReviewException.ReviewAlreadyExist("이미 리뷰를 작성했습니다. \nsender: " + sender.getId() + ", receiver: " + receiver.getId() + ", post: " + targetPost.getId());
+            throw new CustomException(ReviewErrorCode.REVIEW_ALREADY_EXISTS);
         }
     }
 }

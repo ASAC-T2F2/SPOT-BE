@@ -43,23 +43,17 @@ public class ReviewController {
     })
     public ResponseEntity<?> write(@RequestBody CreateReviewRequest writeReviewRequest) {
 
-        try {
-            // 현재 인증된 사용자 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            ReviewResponse result = reviewService.createReview(userEmail, writeReviewRequest);
-
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (UserExceptions.UserNotFoundException | PostException.PostNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (ReviewException.ReviewAlreadyExist e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        // 현재 인증된 사용자 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        ReviewResponse result = reviewService.createReview(userEmail, writeReviewRequest);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
