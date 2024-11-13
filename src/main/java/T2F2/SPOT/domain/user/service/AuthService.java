@@ -4,8 +4,10 @@ import T2F2.SPOT.domain.email.service.EmailService;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
 import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.EmailErrorCode;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthService {
@@ -46,7 +51,7 @@ public class AuthService {
         Boolean isExistNickname = userRepository.existsByNickname(nickname);
 
         if(isExistNickname){
-            throw new UserExceptions.NicknameAlreadyExistsException("Nickname(" + nickname + ") already exists");
+            throw new CustomException(UserErrorCode.NICKNAME_ALREADY_EXIST);
         }
 
         try {
@@ -54,7 +59,7 @@ public class AuthService {
             userRepository.save(newUser);
             return true;
         } catch (Exception e) {
-            throw new UserExceptions.SignUpFailedException("Error while signing up");
+            throw new CustomException(UserErrorCode.SIGN_UP_FAILED);
         }
     }
 
@@ -62,7 +67,7 @@ public class AuthService {
         Boolean isExistNickname = userRepository.existsByNickname(nickname);
 
         if(isExistNickname){
-            throw new UserExceptions.NicknameAlreadyExistsException("Nickname(" + nickname + ") already exists");
+            throw new CustomException(UserErrorCode.NICKNAME_ALREADY_EXIST);
         }
         return true;
     }
@@ -76,7 +81,7 @@ public class AuthService {
         Boolean isExistUser = userRepository.existsByEmail(email);
 
         if(!isExistUser) {
-            throw new UserExceptions.UserNotFoundException(email + " user not found");
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         } else {
             String code = emailService.createCode();
             verificationCodes.put(email, code);
@@ -129,7 +134,7 @@ public class AuthService {
 
         String storedCode = verificationCodes.get(email);
         if(storedCode == null || !storedCode.equals(code)) {
-            throw new IllegalArgumentException(code + " is not correct");
+            throw new CustomException(EmailErrorCode.INVALID_VERIFICATION_CODE);
         }
     }
 
@@ -145,20 +150,16 @@ public class AuthService {
         User user = userRepository.findByEmail(email);
 
         if(user == null) {
-            throw new UserExceptions.UserNotFoundException(email + " User not found");
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         }
 
         if(bCryptPasswordEncoder.matches(newPassword, user.getPassword())) {
-            throw new IllegalArgumentException("기존 비밀번호와 동일합니다.");
+            throw new CustomException(UserErrorCode.SAME_PASSWORD_INPUT);
         }
 
         user.changePassword(newPassword, bCryptPasswordEncoder);
         userRepository.save(user);
 
         verificationCodes.remove(email);
-    }
-
-    public User findByNickname(String nickname) {
-        return userRepository.findByNickname(nickname).orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

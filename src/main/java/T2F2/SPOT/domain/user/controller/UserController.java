@@ -3,7 +3,6 @@ package T2F2.SPOT.domain.user.controller;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.dto.profile.MyProfileResponse;
 import T2F2.SPOT.domain.user.dto.profile.UserProfileResponse;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,21 +38,17 @@ public class UserController {
     })
     public ResponseEntity<?> getMyProfile() {
 
-        try {
-            // 현재 인증된 사용자 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-                return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-            }
-
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            String userEmail = userDetails.getUsername();
-
-            MyProfileResponse myProfileResponse = userService.getMyProfile(userEmail);
-            return new ResponseEntity<>(myProfileResponse, HttpStatus.OK);
-        } catch (UserExceptions.UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        // 현재 인증된 사용자 조회
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
         }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
+
+        MyProfileResponse myProfileResponse = userService.getMyProfile(userEmail);
+        return new ResponseEntity<>(myProfileResponse, HttpStatus.OK);
     }
 
 
@@ -66,11 +61,7 @@ public class UserController {
     })
     public ResponseEntity<?> getUserProfile(@PathVariable Long userId) {
 
-        try {
-            UserProfileResponse userProfileResponse = userService.getUserProfile(userId);
-            return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
-        } catch (UserExceptions.UserNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
+        UserProfileResponse userProfileResponse = userService.getUserProfile(userId);
+        return new ResponseEntity<>(userProfileResponse, HttpStatus.OK);
     }
 }

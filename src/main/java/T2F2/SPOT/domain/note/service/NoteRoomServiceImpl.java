@@ -7,8 +7,10 @@ import T2F2.SPOT.domain.note.repository.NoteRoomRepository;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.NoteErrorCode;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,27 +35,23 @@ public class NoteRoomServiceImpl {
     public void deleteRoom(Long roomId, String requestEmail) {
         User requester = userRepository.findByEmail(requestEmail);
         if(requester == null) {
-            throw new UserExceptions.UserNotFoundException(requestEmail);
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         }
 
-        NoteRoom room = noteRoomRepository.findById(roomId).orElseThrow(() -> new RuntimeException("Room not found: " + roomId));
+        NoteRoom room = noteRoomRepository.findById(roomId).orElseThrow(() -> new CustomException(NoteErrorCode.NOT_FOUND));
 
         if(!room.getOwner().equals(requester) && !room.getGuest().equals(requester)) {
-            throw new RuntimeException("User is not authorized to delete this room");
+            throw new CustomException(NoteErrorCode.DELETE_NOT_AUTHORIZED);
         }
 
         noteRoomRepository.deleteById(roomId);
     }
-//    @Transactional(readOnly = true)
-//    public NoteRoom findRoomById(Long id) {
-//        return noteRoomRepository.findById(id).orElseThrow();
-//    }
 
     public NoteRoomResponseDto createRoom(NoteRoomRequestDto noteRoomRequestDto, String sender) {
 
         User guest = userRepository.findByEmail(sender);
         if (guest == null) {
-            throw new UserExceptions.UserNotFoundException("User not found: " + sender);
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         }
         Post post = postRepository.findById(noteRoomRequestDto.getPostId()).orElseThrow();
 
