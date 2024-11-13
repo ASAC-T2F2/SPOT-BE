@@ -1,10 +1,8 @@
 package T2F2.SPOT.domain.user.controller;
 
-import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
+import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.service.AuthService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

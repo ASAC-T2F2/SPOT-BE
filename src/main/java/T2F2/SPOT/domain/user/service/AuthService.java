@@ -4,7 +4,6 @@ import T2F2.SPOT.domain.email.service.EmailService;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
 import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.EmailErrorCode;
@@ -17,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthService {

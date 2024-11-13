@@ -1,12 +1,9 @@
 package T2F2.SPOT.domain.user.controller;
 
-import T2F2.SPOT.domain.user.exception.TokenException;
-import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
 import T2F2.SPOT.domain.user.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

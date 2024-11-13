@@ -1,7 +1,6 @@
 package T2F2.SPOT.domain.user.service;
 
 import T2F2.SPOT.domain.user.entity.RefreshToken;
-import T2F2.SPOT.domain.user.exception.TokenException;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
 import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
 import T2F2.SPOT.util.exception.CustomException;

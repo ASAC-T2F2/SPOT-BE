@@ -7,7 +7,6 @@ import T2F2.SPOT.domain.note.repository.NoteRoomRepository;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.NoteErrorCode;

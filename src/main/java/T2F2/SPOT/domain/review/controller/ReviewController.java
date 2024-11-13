@@ -1,12 +1,9 @@
 package T2F2.SPOT.domain.review.controller;
 
-import T2F2.SPOT.domain.post.exception.PostException;
-import T2F2.SPOT.domain.review.dto.ReviewResponse;
 import T2F2.SPOT.domain.review.dto.CreateReviewRequest;
-import T2F2.SPOT.domain.review.exception.ReviewException;
+import T2F2.SPOT.domain.review.dto.ReviewResponse;
 import T2F2.SPOT.domain.review.service.ReviewService;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

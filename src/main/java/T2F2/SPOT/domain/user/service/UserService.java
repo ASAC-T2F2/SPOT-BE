@@ -3,7 +3,6 @@ package T2F2.SPOT.domain.user.service;
 import T2F2.SPOT.domain.user.dto.profile.MyProfileResponse;
 import T2F2.SPOT.domain.user.dto.profile.UserProfileResponse;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.UserErrorCode;

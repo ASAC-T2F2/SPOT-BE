@@ -2,9 +2,7 @@ package T2F2.SPOT.domain.email.service;
 
 import T2F2.SPOT.domain.email.dto.EmailDto;
 import T2F2.SPOT.domain.email.entity.Email;
-import T2F2.SPOT.domain.email.exception.EmailException;
 import T2F2.SPOT.domain.email.repository.EmailRepository;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.EmailErrorCode;

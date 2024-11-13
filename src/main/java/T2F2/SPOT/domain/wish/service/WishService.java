@@ -1,14 +1,11 @@
     package T2F2.SPOT.domain.wish.service;
 
     import T2F2.SPOT.domain.post.entity.Post;
-    import T2F2.SPOT.domain.post.exception.PostException;
     import T2F2.SPOT.domain.post.repository.PostRepository;
     import T2F2.SPOT.domain.user.entity.User;
-    import T2F2.SPOT.domain.user.exception.UserExceptions;
     import T2F2.SPOT.domain.user.repository.UserRepository;
     import T2F2.SPOT.domain.wish.dto.*;
     import T2F2.SPOT.domain.wish.entity.Wish;
-    import T2F2.SPOT.domain.wish.exception.WishException;
     import T2F2.SPOT.domain.wish.repository.WishRepository;
     import T2F2.SPOT.util.exception.CustomException;
     import T2F2.SPOT.util.exception.error_code.PostErrorCode;

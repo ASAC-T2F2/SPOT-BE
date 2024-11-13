@@ -1,15 +1,12 @@
 package T2F2.SPOT.domain.review.service;
 
 import T2F2.SPOT.domain.post.entity.Post;
-import T2F2.SPOT.domain.post.exception.PostException;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.review.dto.CreateReviewRequest;
 import T2F2.SPOT.domain.review.dto.ReviewResponse;
 import T2F2.SPOT.domain.review.entity.Review;
-import T2F2.SPOT.domain.review.exception.ReviewException;
 import T2F2.SPOT.domain.review.repository.ReviewRepository;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.PostErrorCode;

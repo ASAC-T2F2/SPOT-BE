@@ -3,7 +3,6 @@ package T2F2.SPOT.domain.user.controller;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.dto.profile.MyProfileResponse;
 import T2F2.SPOT.domain.user.dto.profile.UserProfileResponse;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
