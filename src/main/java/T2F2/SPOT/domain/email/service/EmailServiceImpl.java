@@ -3,8 +3,10 @@ package T2F2.SPOT.domain.email.service;
 import T2F2.SPOT.domain.email.dto.EmailDto;
 import T2F2.SPOT.domain.email.entity.Email;
 import T2F2.SPOT.domain.email.repository.EmailRepository;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.EmailErrorCode;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,8 @@ public class EmailServiceImpl implements EmailService{
     private final UserRepository userRepository;
 
     //랜덤한 6자리의 문자열 코드 생성
-    private String createCode() {
+    @Override
+    public String createCode() {
         int leftLimit = 48; // number '0'
         int rightLimit = 122; // alphabet 'z'
         int targetStringLength = 6;
@@ -51,7 +54,7 @@ public class EmailServiceImpl implements EmailService{
         Boolean isExistUser = userRepository.existsByEmail(email);
 
         if (isExistUser) {
-            throw new UserExceptions.EmailAlreadyExistsException("Email(" + email + ") already exists");
+            throw new CustomException(UserErrorCode.EMAIL_ALREADY_EXIST);
         } else {
             Optional<Email> findEmail = emailRepository.findByEmail(email);
             if(findEmail.isPresent()) {
@@ -63,7 +66,7 @@ public class EmailServiceImpl implements EmailService{
                 saveEmailCode(emailForm);
             } catch (RuntimeException e) {
                 log.error("Failed to send email to {}: {}", email, e.getMessage());
-                throw new RuntimeException("Failed to send email", e);
+                throw new CustomException(EmailErrorCode.SEND_FAILED);
             }
         }
     }
@@ -71,8 +74,9 @@ public class EmailServiceImpl implements EmailService{
     // 이메일과 인증코드 저장하는 메서드
     private void saveEmailCode(EmailDto emailDto) {
         Email email = Email.builder()
-                .email(emailDto.getMail())
+                .email(emailDto.getEmail())
                 .verifyCode(emailDto.getVerifyCode())
+                .emailStatus(false)
                 .build();
         emailRepository.save(email);
     }
@@ -106,27 +110,32 @@ public class EmailServiceImpl implements EmailService{
     /**
      * 인증코드를 검증하는 메서드
      * 저장 후 3분내로 검증요청
-     * @param mail(검증시도하는 메일)
+     * @param email(검증시도하는 메일)
      * @param code(검증시도하는 인증코드)
      * @return
      */
     @Override
-    public String verifyCode(String mail, String code) {
-        Email email = emailRepository.findByEmail(mail).orElseThrow();
-        LocalDateTime vaildTime = email.getCreatedDate().plusMinutes(3);
+    public Boolean verifyCode(String email, String code) {
+        Email mail = emailRepository.findByEmail(email).orElseThrow(() ->
+                new CustomException(EmailErrorCode.NOT_FOUND));
 
-        if(LocalDateTime.now().isAfter(vaildTime)) {
+        LocalDateTime validTime = mail.getCreatedDate().plusMinutes(1);
+
+        // 인증 시간 만료 검사
+        if (LocalDateTime.now().isAfter(validTime)) {
             log.info("인증시간 만료");
-            return "Authentication time has expired";
+            throw new CustomException(EmailErrorCode.EXPIRED_VERIFICATION_CODE);
         }
 
-        if(email.getVerifyCode().equals(code)) {
-            log.info("인증이 완료되었습니다");
-            email.modifyEmailStatus(email.getVerifyCode().equals(code));
-            return "Authentication has been completed";
+        // 인증 코드 일치 검사
+        if (mail.getVerifyCode().equals(code)) {
+            log.info("인증 완료");
+            mail.modifyEmailStatus(true);
+            emailRepository.save(mail);
+            return true;
         } else {
             log.info("인증에 실패하셨습니다");
-            return "Authentication failed";
+            throw new CustomException(EmailErrorCode.INVALID_VERIFICATION_CODE);
         }
     }
 }

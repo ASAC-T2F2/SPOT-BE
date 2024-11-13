@@ -2,13 +2,14 @@ package T2F2.SPOT.domain.email.controller;
 
 import T2F2.SPOT.domain.email.dto.EmailDto;
 import T2F2.SPOT.domain.email.service.EmailService;
-import T2F2.SPOT.domain.user.exception.UserExceptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -19,18 +20,13 @@ public class EmailController {
 
     @PostMapping("/verification-request")
     public ResponseEntity<String> sendMessage(@Validated @RequestBody EmailDto emailDto) {
-        try {
-            emailService.sendEmail(emailDto.getMail());
-            return ResponseEntity.ok("Successfully sent");
-        } catch (UserExceptions.EmailAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        emailService.sendEmail(emailDto.getEmail());
+        return ResponseEntity.ok("이메일 전송 성공");
     }
 
-    @GetMapping("/verification")
+    @PostMapping("/verification")
     public ResponseEntity<String> verificationEmail(@Validated @RequestBody EmailDto emailDto) {
-        emailService.verifyCode(emailDto.getMail(), emailDto.getVerifyCode());
-
-        return ResponseEntity.ok("Successfully verification");
+        emailService.verifyCode(emailDto.getEmail(), emailDto.getVerifyCode());
+        return ResponseEntity.ok("이메일 인증 성공");
     }
 }

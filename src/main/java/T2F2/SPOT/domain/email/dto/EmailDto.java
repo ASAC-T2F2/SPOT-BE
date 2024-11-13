@@ -6,24 +6,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class EmailDto {
 
     // 이메일 주소
-    private String mail;
+    private String email;
     // 인증 코드
     private String verifyCode;
 
     private MimeMessage mimeMessage;
 
-    private EmailDto(MimeMessage mimeMessage, String verifyCode, String mail) {
+    private EmailDto(MimeMessage mimeMessage, String verifyCode, String email) {
         this.mimeMessage = mimeMessage;
         this.verifyCode = verifyCode;
-        this.mail = mail;
+        this.email = email;
     }
 
 
-    public static EmailDto of(MimeMessage mimeMessage, String verifyCode, String mail){
-        return new EmailDto(mimeMessage, verifyCode, mail);
+    public static EmailDto of(MimeMessage mimeMessage, String verifyCode, String email){
+        return new EmailDto(mimeMessage, verifyCode, email);
     }
 }
