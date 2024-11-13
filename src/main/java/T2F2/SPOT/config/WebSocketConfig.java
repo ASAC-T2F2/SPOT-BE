@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-        registry.addEndpoint("/note")
+        registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*");
 //                .withSockJS(); // 웹소켓이 지원되지 않는 환경에서도 실시간 양방향 통신 가능
     }

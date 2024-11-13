@@ -9,6 +9,8 @@ import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.PostErrorCode;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,7 @@ public class PostService {
     private final UserRepository userRepository;
 
     public Post getPostById(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new RuntimeException("Post not found"));
+        return postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
     }
 
     public void createPost(CreatePostDto createPostDto) {
@@ -55,7 +57,7 @@ public class PostService {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
         {
-            throw new RuntimeException("이미 삭제된 게시글");
+            throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
         return responsePostDto.of(findPost);
     }
@@ -103,7 +105,7 @@ public class PostService {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
         {
-            throw new RuntimeException("이미 삭제된 게시글");
+            throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
         findPost.updatePostStatus(status);
     }
@@ -112,7 +114,7 @@ public class PostService {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
         {
-            throw new RuntimeException("이미 삭제된 게시글");
+            throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
         findPost.modifyPost(modifyPostDto);
     }

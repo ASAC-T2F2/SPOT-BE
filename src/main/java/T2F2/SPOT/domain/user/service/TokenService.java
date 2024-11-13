@@ -1,9 +1,10 @@
 package T2F2.SPOT.domain.user.service;
 
 import T2F2.SPOT.domain.user.entity.RefreshToken;
-import T2F2.SPOT.domain.user.exception.TokenException;
 import T2F2.SPOT.domain.user.jwt.JWTUtil;
 import T2F2.SPOT.domain.user.repository.RefreshTokenRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.TokenErrorCode;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,26 +61,26 @@ public class TokenService {
 
         if (refresh == null) {
             // response status code : 프론트와 협업한 상태코드
-            throw new TokenException.RefreshTokenIsNullException("Refresh token is null");
+            throw new CustomException(TokenErrorCode.REFRESH_TOKEN_IS_NULL);
         }
 
         // 토큰 만료 확인
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {
-            throw new TokenException.RefreshTokenExpiredException("Refresh token is expired");
+            throw new CustomException(TokenErrorCode.REFRESH_TOKEN_EXPIRED);
         }
 
         // 토큰 카테고리 확인
         String category = jwtUtil.getCategory(refresh);
         if (!category.equals("refresh")) {
-            throw new TokenException.InvalidTokenCategory("Token's category is not refresh: " + category);
+            throw new CustomException(TokenErrorCode.INVALID_TOKEN_CATEGORY);
         }
 
         // DB에 저장되어 있는 지 확인
         Boolean refreshTokenExist = refreshTokenRepository.existsByRefreshToken(refresh);
         if (!refreshTokenExist) {
-            throw new TokenException.InvalidRefreshToken("Invalid Refresh Token");
+            throw new CustomException(TokenErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         String username = jwtUtil.getUsername(refresh);
