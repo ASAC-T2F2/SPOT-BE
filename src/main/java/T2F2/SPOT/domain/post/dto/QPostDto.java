@@ -9,15 +9,26 @@ import lombok.NoArgsConstructor;
 public class QPostDto {
     Long id;
     String title;
+    String imageUrl;
     int price;
 
-    private QPostDto(Long id, String title, int price) {
+    private QPostDto(Long id, String title, String imageUrl, int price) {
         this.id = id;
         this.title = title;
+        this.imageUrl = imageUrl;
         this.price = price;
     }
     public static QPostDto of(Post post) {
-        return new QPostDto(post.getId(), post.getTitle(), post.getPrice());
+        String url;
+        if(post.getPostImages().isEmpty())
+        {
+            url = "";
+        }
+        else
+        {
+            url = post.getPostImages().get(0).getImageUrl();
+        }
+        return new QPostDto(post.getId(), post.getTitle(), url, post.getPrice());
     }
 
 

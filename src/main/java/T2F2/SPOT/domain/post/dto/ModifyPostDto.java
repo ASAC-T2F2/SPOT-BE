@@ -10,5 +10,6 @@ public class ModifyPostDto {
     String title;
     String content;
     int price;
+    String imageUrl;
 
 }

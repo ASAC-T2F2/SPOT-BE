@@ -9,6 +9,7 @@ import T2F2.SPOT.domain.post.dto.ModifyPostDto;
 import T2F2.SPOT.domain.post.dto.QPostDto;
 import T2F2.SPOT.domain.post.dto.responsePostDto;
 import T2F2.SPOT.domain.post.service.PostService;
+import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +18,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,15 +47,15 @@ public class PostController {
     }
 
 
-    @GetMapping("/posts")
-    @Operation(summary = "전체 게시글 목록 반환", description = "전체 모든 게시글 목록을 반환하는 API")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of posts returned successfully"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public List<responsePostDto> getListPost(){
-        return postService.findAllPost();
-    }
+//    @GetMapping("/posts")
+//    @Operation(summary = "전체 게시글 목록 반환", description = "전체 모든 게시글 목록을 반환하는 API")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "List of posts returned successfully"),
+//            @ApiResponse(responseCode = "500", description = "Internal server error")
+//    })
+//    public List<responsePostDto> getListPost(){
+//        return postService.findAllPost();
+//    }
 
 
     @GetMapping("/post/{id}")

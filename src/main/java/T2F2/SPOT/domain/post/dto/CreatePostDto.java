@@ -5,6 +5,8 @@ import T2F2.SPOT.domain.post.PostStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 public class CreatePostDto {
@@ -15,4 +17,5 @@ public class CreatePostDto {
     private PostFor postFor;
     private PostStatus postStatus;
     private int price;
+    private List<String> images;
 }

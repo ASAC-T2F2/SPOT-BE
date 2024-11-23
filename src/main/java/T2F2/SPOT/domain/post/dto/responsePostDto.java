@@ -2,6 +2,7 @@ package T2F2.SPOT.domain.post.dto;
 
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.entity.Post;
+import T2F2.SPOT.domain.post.entity.PostImage;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.wish.entity.Wish;
 import lombok.Getter;
@@ -22,8 +23,11 @@ public class responsePostDto {
     private int price;
     private int wish_count;
     private LocalDateTime post_date;
+    private List<String> imageUrls;
 
-    public responsePostDto(String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date) {
+    public responsePostDto(String title, String content, User user,
+                           PostStatus postStatus, int price, int wish_count, LocalDateTime post_date,
+                           List<PostImage> images) {
         this.title = title;
         this.content = content;
         this.userNickname = user.getNickname();
@@ -31,6 +35,9 @@ public class responsePostDto {
         this.price = price;
         this.wish_count = wish_count;
         this.post_date = post_date;
+        for (PostImage image : images) {
+            imageUrls.add(image.getImageUrl());
+        }
     }
 
     public responsePostDto(String title, String content, User user) {
@@ -39,7 +46,7 @@ public class responsePostDto {
         this.userNickname = user.getNickname();
     }
 
-    public static responsePostDto of(Post post) {
+    public static responsePostDto of(Post post, List<PostImage> images) {
 
         return new responsePostDto(
                 post.getTitle(),
@@ -48,7 +55,8 @@ public class responsePostDto {
                 post.getPostStatus(),
                 post.getPrice(),
                 post.getWishes().size(),
-                post.getCreatedDate()
+                post.getCreatedDate(),
+                images
         );
     }
 }
