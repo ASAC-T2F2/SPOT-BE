@@ -18,6 +18,7 @@ public class responsePostDto {
     private String title;
     private String content;
     private String userNickname;
+    private Long writerId;
     private PostStatus postStatus;
     private int price;
     private int wish_count;
@@ -27,16 +28,11 @@ public class responsePostDto {
         this.title = title;
         this.content = content;
         this.userNickname = user.getNickname();
+        this.writerId = user.getId();
         this.postStatus = postStatus;
         this.price = price;
         this.wish_count = wish_count;
         this.post_date = post_date;
-    }
-
-    public responsePostDto(String title, String content, User user) {
-        this.title = title;
-        this.content = content;
-        this.userNickname = user.getNickname();
     }
 
     public static responsePostDto of(Post post) {
