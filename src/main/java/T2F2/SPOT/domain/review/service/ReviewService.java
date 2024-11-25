@@ -8,6 +8,7 @@ import T2F2.SPOT.domain.review.entity.Review;
 import T2F2.SPOT.domain.review.repository.ReviewRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.domain.user.service.AuthService;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.PostErrorCode;
 import T2F2.SPOT.util.exception.error_code.ReviewErrorCode;
@@ -24,17 +25,20 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final ReviewRepository reviewRepository;
+    private final AuthService authService;
 
-    public ReviewService(UserRepository userRepository, PostRepository postRepository, ReviewRepository reviewRepository) {
+    public ReviewService(UserRepository userRepository, PostRepository postRepository, ReviewRepository reviewRepository, AuthService authService) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.reviewRepository = reviewRepository;
+        this.authService = authService;
     }
 
     @Transactional
-    public ReviewResponse createReview(String username, CreateReviewRequest createReviewRequest) {
+    public ReviewResponse createReview(CreateReviewRequest createReviewRequest) {
+        String userEmail = authService.getAuthenticatedUserEmail();
 
-        User sender = userRepository.findByEmail(username);
+        User sender = userRepository.findByEmail(userEmail);
         User receiver = userRepository.findById(createReviewRequest.getReceiverId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         log.info("리뷰 작성자 : {}", sender.getId());

@@ -29,16 +29,5 @@ public class NoteController {
 
         log.info("이메일 찾기: {}", email);
         return noteService.sendNote(noteRoomId, email, noteRequest);
-
-//        // 인증된 사용자 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-//            throw new RuntimeException("User is not authenticated.");
-//        }
-//
-//        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-//        User user = customUserDetails.getUser();
-//        log.info("user information: {}", user.getNickname());
-
     }
 }

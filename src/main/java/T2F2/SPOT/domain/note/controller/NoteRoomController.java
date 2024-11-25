@@ -5,6 +5,7 @@ import T2F2.SPOT.domain.note.dto.NoteRoomResponseDto;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.note.service.NoteRoomServiceImpl;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
+import T2F2.SPOT.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class NoteRoomController {
 
     private final NoteRoomServiceImpl noteRoomService;
+    private final AuthService authService;
 
     //로그인한 유저의 채팅방 목록 조회
     @GetMapping("/roomList")
@@ -42,15 +44,7 @@ public class NoteRoomController {
 
     @DeleteMapping("/deleteRoom/{roomId}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
-
-        noteRoomService.deleteRoom(roomId, userEmail);
+        noteRoomService.deleteRoom(roomId);
 
         return new ResponseEntity<>("채팅방 삭제 성공", HttpStatus.OK);
     }
@@ -66,13 +60,7 @@ public class NoteRoomController {
     //채팅방 개설
     @PostMapping("/createRoom")
     public ResponseEntity<?> createRoom(@RequestBody NoteRoomRequestDto noteRoomRequestDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
+        String userEmail = authService.getAuthenticatedUserEmail();
 
         NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto, userEmail);
         log.info("Create Note Room, Post ID: {}, Sender: {}, Receiver: {}", responseDto.getPostId(), responseDto.getOwner(), responseDto.getGuest());
