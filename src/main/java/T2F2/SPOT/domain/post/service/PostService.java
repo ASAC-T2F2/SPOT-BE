@@ -118,5 +118,4 @@ public class PostService {
         }
         findPost.modifyPost(modifyPostDto);
     }
-
 }

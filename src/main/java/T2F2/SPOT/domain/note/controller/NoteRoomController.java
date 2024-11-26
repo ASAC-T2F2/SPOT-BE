@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class NoteRoomController {
 
     private final NoteRoomServiceImpl noteRoomService;
+    private final AuthService authService;
 
     //로그인한 유저의 채팅방 목록 조회
     @GetMapping("/roomList")
@@ -52,15 +53,7 @@ public class NoteRoomController {
 
     @DeleteMapping("/deleteRoom/{roomId}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
-
-        noteRoomService.deleteRoom(roomId, userEmail);
+        noteRoomService.deleteRoom(roomId);
 
         return new ResponseEntity<>("채팅방 삭제 성공", HttpStatus.OK);
     }
@@ -76,13 +69,7 @@ public class NoteRoomController {
     //채팅방 개설
     @PostMapping("/createRoom")
     public ResponseEntity<?> createRoom(@RequestBody NoteRoomRequestDto noteRoomRequestDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
+        String userEmail = authService.getAuthenticatedUserEmail();
 
         NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto, userEmail);
         log.info("Create Note Room, Post ID: {}, Receiver: {}", responseDto.getPostId(), responseDto.getGuest());

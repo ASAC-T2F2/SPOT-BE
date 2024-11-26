@@ -8,6 +8,7 @@ import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.domain.user.service.AuthService;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.NoteErrorCode;
 import T2F2.SPOT.util.exception.error_code.UserErrorCode;
@@ -25,6 +26,7 @@ public class NoteRoomServiceImpl {
     private final NoteRoomRepository noteRoomRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final AuthService authService;
 
     @Transactional(readOnly = true)
     public List<NoteRoom> findNoteRoomsForLoginUser(String guestEmail) {
@@ -32,8 +34,10 @@ public class NoteRoomServiceImpl {
     }
 
     @Transactional
-    public void deleteRoom(Long roomId, String requestEmail) {
+    public void deleteRoom(Long roomId) {
+        String requestEmail = authService.getAuthenticatedUserEmail();
         User requester = userRepository.findByEmail(requestEmail);
+
         if(requester == null) {
             throw new CustomException(UserErrorCode.NOT_FOUND);
         }

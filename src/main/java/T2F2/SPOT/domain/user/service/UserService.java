@@ -14,18 +14,20 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AuthService authService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, AuthService authService) {
         this.userRepository = userRepository;
+        this.authService = authService;
     }
 
     /**
      * 내 정보 반환
-     * @param userEmail
      * @return 내 사용자 정보
      */
-    public MyProfileResponse getMyProfile(String userEmail) {
+    public MyProfileResponse getMyProfile() {
 
+        String userEmail = authService.getAuthenticatedUserEmail();
         User user = userRepository.findByEmail(userEmail);
 
         if (user == null) {

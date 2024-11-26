@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.user.service;
 
 import T2F2.SPOT.domain.email.service.EmailService;
+import T2F2.SPOT.domain.user.dto.CustomUserDetails;
 import T2F2.SPOT.domain.user.dto.JoinDTO;
 import T2F2.SPOT.domain.user.dto.PasswordDTO;
 import T2F2.SPOT.domain.user.entity.User;
@@ -10,7 +11,11 @@ import T2F2.SPOT.util.exception.error_code.EmailErrorCode;
 import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +42,20 @@ public class AuthService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.emailService = emailService;
         this.mailSender = mailSender;
+    }
+
+    /**
+     * 현재 사용자 이메일 반환
+     * @return
+     */
+    public String getAuthenticatedUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            throw new CustomException(UserErrorCode.UNAUTHENTICATED);
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        return userDetails.getUsername();
     }
 
     /**

@@ -4,6 +4,7 @@ import T2F2.SPOT.domain.review.dto.CreateReviewRequest;
 import T2F2.SPOT.domain.review.dto.ReviewResponse;
 import T2F2.SPOT.domain.review.service.ReviewService;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
+import T2F2.SPOT.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,18 +39,7 @@ public class ReviewController {
             @ApiResponse(responseCode = "400", description = "리뷰가 이미 존재함")
     })
     public ResponseEntity<?> write(@RequestBody CreateReviewRequest writeReviewRequest) {
-
-        // 현재 인증된 사용자 조회
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
-
-        ReviewResponse result = reviewService.createReview(userEmail, writeReviewRequest);
-
+        ReviewResponse result = reviewService.createReview(writeReviewRequest);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
