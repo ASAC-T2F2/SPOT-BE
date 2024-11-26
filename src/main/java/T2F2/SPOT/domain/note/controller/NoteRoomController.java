@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +29,17 @@ public class NoteRoomController {
     @GetMapping("/roomList")
     public ResponseEntity<List<NoteRoomResponseDto>> getAllRoomsForLoginUser() {
         // 인증된 사용자 정보 가져오기
-        String LoginUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if(authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.emptyList());
+        }
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+         String LoginUserEmail = userDetails.getUsername();
+
+        log.info("로그인 유저 메일 확인" + LoginUserEmail);
         List<NoteRoom> rooms = noteRoomService.findNoteRoomsForLoginUser(LoginUserEmail);
         List<NoteRoomResponseDto> response = rooms.stream()
                 .map(room -> NoteRoomResponseDto.builder()
@@ -75,8 +85,9 @@ public class NoteRoomController {
         String userEmail = userDetails.getUsername();
 
         NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto, userEmail);
-        log.info("Create Note Room, Post ID: {}, Sender: {}, Receiver: {}", responseDto.getPostId(), responseDto.getOwner(), responseDto.getGuest());
+        log.info("Create Note Room, Post ID: {}, Receiver: {}", responseDto.getPostId(), responseDto.getGuest());
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
+
 
 }

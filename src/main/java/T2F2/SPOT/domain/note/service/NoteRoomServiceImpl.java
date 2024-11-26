@@ -40,7 +40,7 @@ public class NoteRoomServiceImpl {
 
         NoteRoom room = noteRoomRepository.findById(roomId).orElseThrow(() -> new CustomException(NoteErrorCode.NOT_FOUND));
 
-        if(!room.getOwner().equals(requester) && !room.getGuest().equals(requester)) {
+        if(!room.getPost().getUser().equals(requester) && !room.getGuest().equals(requester)) {
             throw new CustomException(NoteErrorCode.DELETE_NOT_AUTHORIZED);
         }
 
@@ -62,17 +62,15 @@ public class NoteRoomServiceImpl {
             return  NoteRoomResponseDto.builder()
                     .roomId(existingRoom.getId())
                     .postId(existingRoom.getPost().getId())
-                    .owner(existingRoom.getOwner().getNickname())
                     .guest(existingRoom.getGuest().getNickname())
                     .build();
         }
 
-        NoteRoom newRoom = NoteRoom.createRoom(post, owner, guest);
+        NoteRoom newRoom = NoteRoom.createRoom(post, guest);
         NoteRoom savedRoom = noteRoomRepository.save(newRoom);
         return NoteRoomResponseDto.builder()
                 .roomId(savedRoom.getId())
                 .postId(savedRoom.getPost().getId())
-                .owner(savedRoom.getOwner().getNickname())
                 .guest(savedRoom.getGuest().getNickname())
                 .build();
     }
