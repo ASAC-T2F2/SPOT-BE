@@ -5,6 +5,7 @@ import T2F2.SPOT.domain.note.dto.NoteRoomResponseDto;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.note.service.NoteRoomServiceImpl;
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
+import T2F2.SPOT.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
