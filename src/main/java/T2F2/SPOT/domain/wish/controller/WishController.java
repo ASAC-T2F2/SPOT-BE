@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.wish.controller;
 
 import T2F2.SPOT.domain.user.dto.CustomUserDetails;
+import T2F2.SPOT.domain.user.service.AuthService;
 import T2F2.SPOT.domain.wish.dto.*;
 import T2F2.SPOT.domain.wish.service.WishService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,9 +26,11 @@ import java.util.List;
 public class WishController {
 
     private final WishService wishService;
+    private final AuthService authService;
 
-    public WishController(WishService wishService) {
+    public WishController(WishService wishService, AuthService authService) {
         this.wishService = wishService;
+        this.authService = authService;
     }
 
     @PostMapping("/add")
@@ -40,14 +43,8 @@ public class WishController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     public ResponseEntity<?> addWish(@RequestBody AddWishRequest addWishRequest) {
-        // 현재 인증된 사용자 조회
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
+        String userEmail = authService.getAuthenticatedUserEmail();
 
         AddWishResponse response = wishService.addWish(addWishRequest, userEmail);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -64,14 +61,7 @@ public class WishController {
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelWish(@RequestBody CancelWishRequest cancelWishRequest) {
 
-        // 현재 인증된 사용자 조회
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
+        String userEmail = authService.getAuthenticatedUserEmail();
 
         CancelWishResponse cancelWishResponse = wishService.cancelWish(cancelWishRequest, userEmail);
         return new ResponseEntity<>(cancelWishResponse, HttpStatus.OK);
@@ -87,14 +77,8 @@ public class WishController {
     })
     @GetMapping("/wishes")
     public ResponseEntity<?> getWishes() {
-        // 현재 인증된 사용자 조회
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails)) {
-            return new ResponseEntity<>("User is not authenticated", HttpStatus.UNAUTHORIZED);
-        }
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = userDetails.getUsername();
+        String userEmail = authService.getAuthenticatedUserEmail();
 
         List<PreviewWishResponse> wishes = wishService.findAllWish(userEmail);
         return new ResponseEntity<>(wishes, HttpStatus.OK);

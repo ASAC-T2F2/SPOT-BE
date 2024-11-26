@@ -10,13 +10,13 @@ import T2F2.SPOT.domain.post.dto.QPostDto;
 import T2F2.SPOT.domain.post.dto.responsePostDto;
 import T2F2.SPOT.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -60,8 +60,9 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "Post not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public responsePostDto getDetailPost(@PathVariable("id") Long id) {
-        return postService.findPostById(id);
+    public ResponseEntity<?> getDetailPost(@PathVariable("id") Long id) {
+        responsePostDto result = postService.findPostById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
