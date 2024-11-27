@@ -3,28 +3,24 @@ package T2F2.SPOT.domain.post.dto;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.user.entity.User;
-import T2F2.SPOT.domain.wish.entity.Wish;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
-@RequiredArgsConstructor
-public class responsePostDto {
+public class PostResponse {
 
-    private String title;
-    private String content;
-    private String userNickname;
-    private Long writerId;
-    private PostStatus postStatus;
-    private int price;
-    private int wish_count;
-    private LocalDateTime post_date;
+    private final String title;
+    private final String content;
+    private final String userNickname;
+    private final Long writerId;
+    private final PostStatus postStatus;
+    private final int price;
+    private final int wish_count;
+    private final LocalDateTime post_date;
 
-    public responsePostDto(String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date) {
+    public PostResponse(String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date) {
         this.title = title;
         this.content = content;
         this.userNickname = user.getNickname();
@@ -35,9 +31,9 @@ public class responsePostDto {
         this.post_date = post_date;
     }
 
-    public static responsePostDto of(Post post) {
+    public static PostResponse of(Post post) {
 
-        return new responsePostDto(
+        return new PostResponse(
                 post.getTitle(),
                 post.getContent(),
                 post.getUser(),

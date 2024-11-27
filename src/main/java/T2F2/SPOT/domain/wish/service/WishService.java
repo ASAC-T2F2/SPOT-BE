@@ -41,10 +41,8 @@
         public AddWishResponse addWish(AddWishRequest addWishRequest, String username) {
 
             // 사용자 확인
-            User user = userRepository.findByEmail(username);
-            if (user == null) {
-                throw new CustomException(UserErrorCode.NOT_FOUND);
-            }
+            User user = userRepository.findByEmail(username)
+                    .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
             log.info("[AddWish] - User: {}", user.getEmail());
 
             // 대상 게시글 확인

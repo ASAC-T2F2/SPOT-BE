@@ -9,9 +9,10 @@ import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.domain.user.service.AuthService;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.PostErrorCode;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -32,36 +33,75 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final AuthService authService;
 
+    /**
+     * PostId 기반 게시글 가져오기
+     * @param id
+     * @return 단일 게시글
+     */
+    @Transactional(readOnly = true)
     public Post getPostById(Long id) {
         return postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
     }
 
+
+    /**
+     * 게시글 생성 로직
+     * @param createPostDto
+     */
     public void createPost(CreatePostDto createPostDto) {
         User findUser = userRepository.findById(createPostDto.getUserId()).orElseThrow();
         Post result = postRepository.save(Post.of(createPostDto, findUser));
     }
 
+
+    /**
+     * 모든 게시글 목록 반환
+     * @return 모든 게시글
+     */
     @Transactional(readOnly = true)
-    public List<responsePostDto> findAllPost() {
+    public List<PostResponse> findAllPost() {
         return postRepository.findAll()
                 .stream()
                 .map(post ->
-                        post.getIsDeleted() ? null : responsePostDto.of(post))
+                        post.getIsDeleted() ? null : PostResponse.of(post))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
+
+    /**
+     * 상품 상세정보 반환
+     * @param id
+     * @return 내가 작성한 게시글인지 확인 된 상품 상세정보
+     */
     @Transactional(readOnly = true)
-    public responsePostDto findPostById(Long id) {
-        Post findPost = postRepository.findById(id).orElseThrow();
+    public PostResponse getPostDetail(Long id) {
+        Post findPost = postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+
         if(findPost.getIsDeleted())
         {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
-        return responsePostDto.of(findPost);
+
+        boolean isAuthor = isAuthor(findPost.getUser().getId());
+        return PostDetail.of(findPost, isAuthor);
     }
 
+
+    /**
+     * 검색필터를 통한 게시글 반환
+     * @param keyword
+     * @param category
+     * @param postFor
+     * @param postStatus
+     * @param minPrice
+     * @param maxPrice
+     * @param sortBy
+     * @param startIndex
+     * @return 필터 적용된 게시글
+     */
     @Transactional(readOnly = true)
     public Slice<QPostDto> getSearchFilterList(
             String keyword,
@@ -83,6 +123,13 @@ public class PostService {
                 condition
         );
     }
+
+
+    /**
+     * 전공에 맞는 게시글 반환
+     * @param major
+     * @return 내 전공 게시글
+     */
     @Transactional(readOnly = true)
     public List<QPostDto> findPostByMajor(String major) {
         return postRepository.findByMajor(major)
@@ -93,6 +140,12 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+
+    /**
+     * 사용자 Id 기반 게시글 반환
+     * @param userId
+     * @return 게시글
+     */
     public List<QPostDto> findPostByUserId(Long userId) {
         return postRepository.findByUserId(userId)
                 .stream()
@@ -101,6 +154,13 @@ public class PostService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
+
+    /**
+     * 게시글 상태 변경
+     * @param id
+     * @param status
+     */
     public void updateStatus(Long id, String status) {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
@@ -110,6 +170,12 @@ public class PostService {
         findPost.updatePostStatus(status);
     }
 
+
+    /**
+     * 게시글 정보 수정
+     * @param id
+     * @param modifyPostDto
+     */
     public void modifyPost(Long id, ModifyPostDto modifyPostDto) {
         Post findPost = postRepository.findById(id).orElseThrow();
         if(findPost.getIsDeleted())
@@ -117,5 +183,19 @@ public class PostService {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
         findPost.modifyPost(modifyPostDto);
+    }
+
+
+    /**
+     * 내가 작성한 게시글인지 확인
+     * @param writerId
+     * @return 참/거짓
+     */
+    public boolean isAuthor(Long writerId) {
+        String userEmail = authService.getAuthenticatedUserEmail();
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
+
+        return Objects.equals(user.getId(), writerId);
     }
 }

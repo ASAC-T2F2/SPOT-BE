@@ -38,7 +38,8 @@ public class ReviewService {
     public ReviewResponse createReview(CreateReviewRequest createReviewRequest) {
         String userEmail = authService.getAuthenticatedUserEmail();
 
-        User sender = userRepository.findByEmail(userEmail);
+        User sender = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         User receiver = userRepository.findById(createReviewRequest.getReceiverId())
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         log.info("리뷰 작성자 : {}", sender.getId());

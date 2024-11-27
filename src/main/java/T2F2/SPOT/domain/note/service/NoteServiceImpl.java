@@ -8,6 +8,8 @@ import T2F2.SPOT.domain.note.repository.NoteRepository;
 import T2F2.SPOT.domain.note.repository.NoteRoomRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.repository.UserRepository;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,8 @@ public class NoteServiceImpl {
         NoteRoom room = noteRoomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("NoteRoom not found"));
 
-        User sender = userRepository.findByEmail(senderEmail);
+        User sender = userRepository.findByEmail(senderEmail)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
 
         log.info("Sender email: " + senderEmail, sender.getNickname());
         Note newNote = Note.createNote(noteRequest.getNoteContent(), sender, room);

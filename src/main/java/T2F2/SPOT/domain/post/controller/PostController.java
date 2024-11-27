@@ -7,7 +7,7 @@ import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.CreatePostDto;
 import T2F2.SPOT.domain.post.dto.ModifyPostDto;
 import T2F2.SPOT.domain.post.dto.QPostDto;
-import T2F2.SPOT.domain.post.dto.responsePostDto;
+import T2F2.SPOT.domain.post.dto.PostResponse;
 import T2F2.SPOT.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,7 +48,7 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "List of posts returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<responsePostDto> getListPost(){
+    public List<PostResponse> getListPost(){
         return postService.findAllPost();
     }
 
@@ -61,7 +61,7 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<?> getDetailPost(@PathVariable("id") Long id) {
-        responsePostDto result = postService.findPostById(id);
+        PostResponse result = postService.getPostDetail(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
