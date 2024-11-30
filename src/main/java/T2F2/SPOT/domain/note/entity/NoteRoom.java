@@ -31,25 +31,23 @@ public class NoteRoom extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
-    private User owner;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "owner_id")
+//    private User owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guest_id")
     private User guest;
 
     @Builder
-    public NoteRoom(Post post, User owner, User guest) {
+    public NoteRoom(Post post, User guest) {
         this.post = post;
-        this.owner = owner;
         this.guest = guest;
     }
 
-    public static NoteRoom createRoom(Post post, User owner, User guest) {
+    public static NoteRoom createRoom(Post post, User guest) {
         return NoteRoom.builder()
                 .post(post)
-                .owner(owner)
                 .guest(guest)
                 .build();
     }
