@@ -28,20 +28,26 @@ public class Note extends BaseEntity {
     private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "note_room_id")
     private NoteRoom noteRoom;
 
     @Builder
-    public Note(String noteContent, User sender, NoteRoom noteRoom) {
+    public Note(String noteContent, User sender, User receiver, NoteRoom noteRoom) {
         this.noteContent = noteContent;
         this.sender = sender;
+        this.receiver = receiver;
         this.noteRoom = noteRoom;
     }
 
-    public static Note createNote(String noteContent, User sender, NoteRoom noteRoom) {
+    public static Note createNote(String noteContent, User sender, User receiver, NoteRoom noteRoom) {
         return Note.builder()
                 .noteContent(noteContent)
                 .sender(sender)
+                .receiver(receiver)
                 .noteRoom(noteRoom)
                 .build();
     }

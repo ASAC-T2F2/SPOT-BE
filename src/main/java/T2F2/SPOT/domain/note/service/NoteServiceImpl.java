@@ -1,6 +1,5 @@
 package T2F2.SPOT.domain.note.service;
 
-import T2F2.SPOT.domain.note.dto.NoteRequest;
 import T2F2.SPOT.domain.note.dto.NoteResponse;
 import T2F2.SPOT.domain.note.entity.Note;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
@@ -13,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @Transactional
@@ -25,7 +22,7 @@ public class NoteServiceImpl {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
 
-    public NoteResponse sendNote(Long roomId, String senderEmail, NoteRequest noteRequest) {
+    public NoteResponse sendNote(Long roomId, String senderEmail, String noteContent) {
 
         NoteRoom room = noteRoomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("NoteRoom not found"));
@@ -33,18 +30,17 @@ public class NoteServiceImpl {
         User sender = userRepository.findByEmail(senderEmail);
 
         log.info("Sender email: " + senderEmail, sender.getNickname());
-        Note newNote = Note.createNote(noteRequest.getNoteContent(), sender, room);
+        User receiver = room.getPost().getUser();
+
+        Note newNote = Note.createNote(noteContent, sender, receiver, room);
         Note savedNote = noteRepository.save(newNote);
         log.info("Saved new note with ID: {}", savedNote.getId());
 
-        return new NoteResponse(
-                savedNote.getSender().getNickname(),
-                savedNote.getNoteContent()
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public List<Note> findAllNoteByNoteRoomId(Long noteRoomId) {
-        return noteRepository.findAllByNoteRoomId(noteRoomId);
+        return NoteResponse.builder().
+                sender(savedNote.getSender().getNickname())
+                .receiver(savedNote.getReceiver().getNickname())
+                .noteContent(savedNote.getNoteContent())
+                .sentAt(savedNote.getCreatedDate())
+                .build();
     }
 }

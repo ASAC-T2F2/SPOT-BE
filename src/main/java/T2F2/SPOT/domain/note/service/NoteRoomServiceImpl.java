@@ -1,8 +1,11 @@
 package T2F2.SPOT.domain.note.service;
 
+import T2F2.SPOT.domain.note.dto.NoteResponse;
 import T2F2.SPOT.domain.note.dto.NoteRoomRequestDto;
 import T2F2.SPOT.domain.note.dto.NoteRoomResponseDto;
+import T2F2.SPOT.domain.note.entity.Note;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
+import T2F2.SPOT.domain.note.repository.NoteRepository;
 import T2F2.SPOT.domain.note.repository.NoteRoomRepository;
 import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,6 +29,7 @@ import java.util.List;
 public class NoteRoomServiceImpl {
 
     private final NoteRoomRepository noteRoomRepository;
+    private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final AuthService authService;
@@ -59,8 +65,6 @@ public class NoteRoomServiceImpl {
         }
         Post post = postRepository.findById(noteRoomRequestDto.getPostId()).orElseThrow();
 
-        User owner = post.getUser();
-
         NoteRoom existingRoom = noteRoomRepository.findByPostAndGuest(post, guest);
         if(existingRoom != null) {
             return  NoteRoomResponseDto.builder()
@@ -79,5 +83,25 @@ public class NoteRoomServiceImpl {
                 .build();
     }
 
+    public List<NoteResponse> enterRoom(Long roomId, String userEmail) {
+
+        NoteRoom room = noteRoomRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(NoteErrorCode.NOT_FOUND));
+
+//        Post post = room.getPost();
+
+        List<NoteResponse> notes = noteRepository.findAllByNoteRoomId(roomId).stream()
+                .map(note -> NoteResponse.builder()
+                        .sender(note.getSender().getNickname())
+                        .receiver(note.getReceiver().getNickname())
+                        .noteContent(note.getNoteContent())
+                        .sentAt(note.getCreatedDate())
+                        .isSender(userEmail.equals(note.getSender().getEmail()))
+                        .build())
+                .collect(Collectors.toList());
+
+        return notes;
+
+    }
 
 }
