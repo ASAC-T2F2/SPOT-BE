@@ -1,6 +1,5 @@
 package T2F2.SPOT.domain.note.controller;
 
-import T2F2.SPOT.domain.note.dto.NoteRequest;
 import T2F2.SPOT.domain.note.dto.NoteResponse;
 import T2F2.SPOT.domain.note.service.NoteServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +21,12 @@ public class NoteController {
     @MessageMapping("/room/{noteRoomId}")
     @SendTo("/sub/room/{noteRoomId}")
     public NoteResponse sendNote(@DestinationVariable Long noteRoomId,
-                                 @Payload NoteRequest noteRequest,
+                                 @Payload String noteContent,
                                  SimpMessageHeaderAccessor accessor) {
 
         String email = (String) accessor.getSessionAttributes().get("senderEmail");
 
         log.info("이메일 찾기: {}", email);
-        return noteService.sendNote(noteRoomId, email, noteRequest);
+        return noteService.sendNote(noteRoomId, email, noteContent);
     }
 }
