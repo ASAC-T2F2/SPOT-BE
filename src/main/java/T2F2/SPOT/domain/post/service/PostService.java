@@ -72,6 +72,29 @@ public class PostService {
 
 
     /**
+     * 살래요/ 팔래요 게시글 목록 반환.
+     * 무한 스크롤 방식
+     * @param limit
+     * @param lastPostId
+     * @param postFor
+     * @return 목적에 따른 게시글 목록
+     */
+    @Transactional(readOnly = true)
+    public PostListWithPagination findPostsForPurpose(int limit, Long lastPostId, PostFor postFor) {
+        List<Post> fetchedPosts = postRepository.fetchPostsForPurposeSorted(limit, lastPostId, postFor);
+
+        List<PostResponse> postResponses = fetchedPosts.stream()
+                .map(PostResponse::of)
+                .collect(Collectors.toList());
+
+        Long lastId = fetchedPosts.isEmpty() ? null : fetchedPosts.get(fetchedPosts.size() - 1).getId();
+        boolean hasMore = postRepository.hasMorePosts(lastPostId, postFor);
+
+        return PostListWithPagination.of(postResponses, lastId, hasMore);
+    }
+
+
+    /**
      * 상품 상세정보 반환
      * @param id
      * @return 내가 작성한 게시글인지 확인 된 상품 상세정보

@@ -1,9 +1,11 @@
 package T2F2.SPOT.domain.post.repository;
 
+import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.dto.QPostDto;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
 import T2F2.SPOT.domain.post.entity.Post;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,4 +71,42 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetch();
     }
 
+
+    /**
+     * 살래요/팔래요 게시글 목록 가져오기 (무한스크롤)
+     * @param limit
+     * @param lastPostId
+     * @param postFor
+     * @return 목적에 맞는 게시글 목록
+     */
+    @Override
+    public List<Post> fetchPostsForPurposeSorted(int limit, Long lastPostId, PostFor postFor) {
+        OrderSpecifier<?> newest = post.createdDate.desc();
+
+        return queryFactory
+                .selectFrom(post)
+                .join(post.user, user)
+                .where(post.postFor.eq(postFor)
+                        .and(post.id.lt(lastPostId)))
+                .orderBy(newest)
+                .limit(limit)
+                .fetch();
+    }
+
+    /**
+     * 가져올 게시글이 더 남았는지 확인.
+     * postId와 작성시간의 순서가 같으므로 정렬은 생략.
+     * @param lastPostId
+     * @param postFor
+     * @return 참/거짓
+     */
+    @Override
+    public boolean hasMorePosts(Long lastPostId, PostFor postFor) {
+        return queryFactory
+                .selectOne()
+                .from(post)
+                .where(post.postFor.eq(postFor)
+                        .and(post.id.lt(lastPostId)))
+                .fetchFirst() != null;
+    }
 }

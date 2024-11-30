@@ -4,10 +4,7 @@ import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
-import T2F2.SPOT.domain.post.dto.CreatePostDto;
-import T2F2.SPOT.domain.post.dto.ModifyPostDto;
-import T2F2.SPOT.domain.post.dto.QPostDto;
-import T2F2.SPOT.domain.post.dto.PostResponse;
+import T2F2.SPOT.domain.post.dto.*;
 import T2F2.SPOT.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,6 +47,18 @@ public class PostController {
     })
     public List<PostResponse> getListPost(){
         return postService.findAllPost();
+    }
+
+
+    @GetMapping("/posts/purpose")
+    @Operation(summary = "팔래요/살래요 게시글 목록 반환", description = "팔래요/살래요 게시글 목록을 반환하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "팔래요/살래요 게시글 목록 반환 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 에러")
+    })
+    public ResponseEntity<PostListWithPagination> getPostsByPurpose(@RequestParam int limit, @RequestParam(required = false) Long lastPostId, @RequestParam PostFor postFor) {
+        PostListWithPagination resultPosts = postService.findPostsForPurpose(limit, lastPostId == null ? Long.MAX_VALUE : lastPostId, postFor);
+        return new ResponseEntity<>(resultPosts, HttpStatus.OK);
     }
 
 
