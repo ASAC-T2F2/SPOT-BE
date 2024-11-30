@@ -28,11 +28,8 @@ public class UserService {
     public MyProfileResponse getMyProfile() {
 
         String userEmail = authService.getAuthenticatedUserEmail();
-        User user = userRepository.findByEmail(userEmail);
-
-        if (user == null) {
-            throw new CustomException(UserErrorCode.NOT_FOUND);
-        }
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
 
         log.info("[User Service] - Found User: {}", user.getEmail());
 

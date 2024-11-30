@@ -166,11 +166,8 @@ public class AuthService {
         String email = passwordDTO.getEmail();
         String newPassword = passwordDTO.getNewPassword();
 
-        User user = userRepository.findByEmail(email);
-
-        if(user == null) {
-            throw new CustomException(UserErrorCode.NOT_FOUND);
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
 
         if(bCryptPasswordEncoder.matches(newPassword, user.getPassword())) {
             throw new CustomException(UserErrorCode.SAME_PASSWORD_INPUT);

@@ -42,11 +42,8 @@ public class NoteRoomServiceImpl {
     @Transactional
     public void deleteRoom(Long roomId) {
         String requestEmail = authService.getAuthenticatedUserEmail();
-        User requester = userRepository.findByEmail(requestEmail);
-
-        if(requester == null) {
-            throw new CustomException(UserErrorCode.NOT_FOUND);
-        }
+        User requester = userRepository.findByEmail(requestEmail)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
 
         NoteRoom room = noteRoomRepository.findById(roomId).orElseThrow(() -> new CustomException(NoteErrorCode.NOT_FOUND));
 
@@ -59,10 +56,8 @@ public class NoteRoomServiceImpl {
 
     public NoteRoomResponseDto createRoom(NoteRoomRequestDto noteRoomRequestDto, String sender) {
 
-        User guest = userRepository.findByEmail(sender);
-        if (guest == null) {
-            throw new CustomException(UserErrorCode.NOT_FOUND);
-        }
+        User guest = userRepository.findByEmail(sender)
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         Post post = postRepository.findById(noteRoomRequestDto.getPostId()).orElseThrow();
 
         NoteRoom existingRoom = noteRoomRepository.findByPostAndGuest(post, guest);
