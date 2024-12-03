@@ -22,15 +22,12 @@ import java.util.stream.Collectors;
 public class NoteRoomController {
 
     private final NoteRoomServiceImpl noteRoomService;
-    private final AuthService authService;
 
     //로그인한 유저의 채팅방 목록 조회
     @GetMapping("/roomList")
     public ResponseEntity<List<NoteRoomResponseDto>> getAllRoomsForLoginUser() {
-        // 인증된 사용자 정보 가져오기
-        String userEmail = authService.getAuthenticatedUserEmail();
 
-        List<NoteRoom> rooms = noteRoomService.findNoteRoomsForLoginUser(userEmail);
+        List<NoteRoom> rooms = noteRoomService.findNoteRoomsForLoginUser();
         List<NoteRoomResponseDto> response = rooms.stream()
                 .map(room -> NoteRoomResponseDto.builder()
                         .roomId(room.getId())
@@ -40,6 +37,7 @@ public class NoteRoomController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    //채팅방 삭제
     @DeleteMapping("/deleteRoom/{roomId}")
     public ResponseEntity<String> deleteRoom(@PathVariable Long roomId) {
         noteRoomService.deleteRoom(roomId);
@@ -51,18 +49,17 @@ public class NoteRoomController {
     //채팅방 개설
     @PostMapping("/createRoom")
     public ResponseEntity<?> createRoom(@RequestBody NoteRoomRequestDto noteRoomRequestDto) {
-        String userEmail = authService.getAuthenticatedUserEmail();
 
-        NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto, userEmail);
+        NoteRoomResponseDto responseDto = noteRoomService.createRoom(noteRoomRequestDto);
         log.info("Create Note Room, Post ID: {}, Receiver: {}", responseDto.getPostId(), responseDto.getGuest());
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
 
+    //채팅방 입장
     @GetMapping("/enterRoom/{roomId}")
     public ResponseEntity<List<NoteResponse>> enterRoom(@PathVariable Long roomId) {
-        String userEmail = authService.getAuthenticatedUserEmail();
-        List<NoteResponse> responses = noteRoomService.enterRoom(roomId, userEmail);
+        List<NoteResponse> responses = noteRoomService.enterRoom(roomId);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 

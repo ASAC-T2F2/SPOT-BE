@@ -3,7 +3,6 @@ package T2F2.SPOT.domain.note.service;
 import T2F2.SPOT.domain.note.dto.NoteResponse;
 import T2F2.SPOT.domain.note.dto.NoteRoomRequestDto;
 import T2F2.SPOT.domain.note.dto.NoteRoomResponseDto;
-import T2F2.SPOT.domain.note.entity.Note;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
 import T2F2.SPOT.domain.note.repository.NoteRepository;
 import T2F2.SPOT.domain.note.repository.NoteRoomRepository;
@@ -14,13 +13,13 @@ import T2F2.SPOT.domain.user.repository.UserRepository;
 import T2F2.SPOT.domain.user.service.AuthService;
 import T2F2.SPOT.util.exception.CustomException;
 import T2F2.SPOT.util.exception.error_code.NoteErrorCode;
+import T2F2.SPOT.util.exception.error_code.PostErrorCode;
 import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,13 +34,18 @@ public class NoteRoomServiceImpl {
     private final AuthService authService;
 
     @Transactional(readOnly = true)
-    public List<NoteRoom> findNoteRoomsForLoginUser(String guestEmail) {
+    public List<NoteRoom> findNoteRoomsForLoginUser() {
+
+        String guestEmail = authService.getAuthenticatedUserEmail();
+
         return noteRoomRepository.findByGuestEmail(guestEmail);
     }
 
-    @Transactional
+
     public void deleteRoom(Long roomId) {
+
         String requestEmail = authService.getAuthenticatedUserEmail();
+
         User requester = userRepository.findByEmail(requestEmail)
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
 
@@ -54,11 +58,14 @@ public class NoteRoomServiceImpl {
         noteRoomRepository.deleteById(roomId);
     }
 
-    public NoteRoomResponseDto createRoom(NoteRoomRequestDto noteRoomRequestDto, String sender) {
+    public NoteRoomResponseDto createRoom(NoteRoomRequestDto noteRoomRequestDto) {
+
+        String sender = authService.getAuthenticatedUserEmail();
 
         User guest = userRepository.findByEmail(sender)
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
-        Post post = postRepository.findById(noteRoomRequestDto.getPostId()).orElseThrow();
+        Post post = postRepository.findById(noteRoomRequestDto.getPostId())
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
 
         NoteRoom existingRoom = noteRoomRepository.findByPostAndGuest(post, guest);
         if(existingRoom != null) {
@@ -78,7 +85,10 @@ public class NoteRoomServiceImpl {
                 .build();
     }
 
-    public List<NoteResponse> enterRoom(Long roomId, String userEmail) {
+    @Transactional(readOnly = true)
+    public List<NoteResponse> enterRoom(Long roomId) {
+
+        String userEmail = authService.getAuthenticatedUserEmail();
 
         NoteRoom room = noteRoomRepository.findById(roomId)
                 .orElseThrow(() -> new CustomException(NoteErrorCode.NOT_FOUND));
