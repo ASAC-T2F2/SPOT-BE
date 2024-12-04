@@ -1,7 +1,7 @@
 package T2F2.SPOT.domain.post.repository;
 
 import T2F2.SPOT.domain.post.PostFor;
-import T2F2.SPOT.domain.post.dto.QPostDto;
+import T2F2.SPOT.domain.post.dto.PostPreviewResponse;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
 import T2F2.SPOT.domain.post.entity.Post;
 import com.querydsl.core.BooleanBuilder;
@@ -9,13 +9,12 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Objects;
 
 import static T2F2.SPOT.domain.post.PostQueryHelper.createFilterBuilder;
 import static T2F2.SPOT.domain.post.PostQueryHelper.getOrderSpecifier;
@@ -31,26 +30,33 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
     @Override
-    public Slice<QPostDto> searchPosts(Pageable pageable, SearchPostConditionDto searchPostConditionDto) {
+    public Slice<PostPreviewResponse> searchPosts(Pageable pageable, SearchPostConditionDto searchPostConditionDto) {
 
         BooleanBuilder condition = createFilterBuilder(searchPostConditionDto);
 
         log.info("condition : {} ", condition );
+
         List<Post> posts = queryFactory
                 .selectFrom(post)
+                .join(post.user, user).fetchJoin()
                 .where(condition)
                 .orderBy(getOrderSpecifier(searchPostConditionDto.getSortBy(), post))
-//                .offset(pageable.getOffset())
-//                .limit(pageable.getPageSize())
-                .fetch()
-                .stream()
-                .map(post -> post.getIsDeleted() ? null : post)
-                .filter(Objects::nonNull)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1) // 요청 개수보다 1개 더 가져옴
+                .fetch();
+
+        List<PostPreviewResponse> content = posts.stream()
+                .filter(post -> !post.getIsDeleted())
+                .map(PostPreviewResponse::of)
                 .toList();
 
-        List<QPostDto> content = posts.stream().map(QPostDto::of).toList();
-        return new PageImpl<>(content);
+        // 초과 데이터 확인 및 제거
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) {
+            content = content.subList(0, pageable.getPageSize());
+        }
 
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     @Override

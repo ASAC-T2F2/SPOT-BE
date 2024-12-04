@@ -126,21 +126,20 @@ public class PostService {
      * @return 필터 적용된 게시글
      */
     @Transactional(readOnly = true)
-    public Slice<QPostDto> getSearchFilterList(
+    public Slice<PostPreviewResponse> getSearchFilterList(
+            int limit,
+            int startIndex,
             String keyword,
             Category category,
             PostFor postFor,
             PostStatus postStatus,
             int minPrice,
             int maxPrice,
-            SortBy sortBy,
-            int startIndex
+            SortBy sortBy
             ) {
-        Pageable pageable = PageRequest.of(startIndex, 10);
+        Pageable pageable = PageRequest.of(startIndex, limit);
         SearchPostConditionDto condition = SearchPostConditionDto.of(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy);
-        log.info("Keyword : {}, Category : {}, PostFor : {}, PostStatus : {}, price : {} ~ {}, Sort : {}, StartIndex : {} ", condition.getKeyword(), condition.getCategory(),
-                condition.getPostFor(), condition.getPostStatus(), condition.getMinPrice(), condition.getMaxPrice(), condition.getSortBy(), startIndex
-        );
+
         return postRepository.searchPosts(
                 pageable,
                 condition
@@ -154,11 +153,11 @@ public class PostService {
      * @return 내 전공 게시글
      */
     @Transactional(readOnly = true)
-    public List<QPostDto> findPostByMajor(String major) {
+    public List<PostPreviewResponse> findPostByMajor(String major) {
         return postRepository.findByMajor(major)
                 .stream()
                 .map(post ->
-                        post.getIsDeleted() ? null : QPostDto.of(post))
+                        post.getIsDeleted() ? null : PostPreviewResponse.of(post))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -169,11 +168,11 @@ public class PostService {
      * @param userId
      * @return 게시글
      */
-    public List<QPostDto> findPostByUserId(Long userId) {
+    public List<PostPreviewResponse> findPostByUserId(Long userId) {
         return postRepository.findByUserId(userId)
                 .stream()
                 .map(post ->
-                        post.getIsDeleted() ? null : QPostDto.of(post))
+                        post.getIsDeleted() ? null : PostPreviewResponse.of(post))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

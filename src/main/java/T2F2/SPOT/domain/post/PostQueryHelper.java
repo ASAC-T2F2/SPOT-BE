@@ -2,7 +2,6 @@ package T2F2.SPOT.domain.post;
 
 import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
-import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.entity.QPost;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
@@ -22,13 +21,10 @@ public class PostQueryHelper {
             // sort가 null인 경우 기본 정렬 기준으로 처리
             return post.createdDate.desc();
         }
-        switch (sortBy) {
-            case POPULAR:
-                return post.wishes.size().desc();
-            case LATEST:
-            default:
-                return post.createdDate.desc();
-        }
+        return switch (sortBy) {
+            case POPULAR -> post.wishes.size().desc();
+            default -> post.createdDate.desc();
+        };
     }
 
     public static BooleanBuilder createFilterBuilder(SearchPostConditionDto searchPostConditionDto){
