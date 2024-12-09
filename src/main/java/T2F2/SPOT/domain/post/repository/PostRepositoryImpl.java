@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.post.repository;
 
 import T2F2.SPOT.domain.post.PostFor;
+import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.PostPreviewResponse;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
 import T2F2.SPOT.domain.post.entity.Post;
@@ -60,12 +61,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public List<Post> findByMajor(String major) {
-        return queryFactory
+    public Slice<PostPreviewResponse> findByMajor(Pageable pageable, String major, SortBy sortBy) {
+        List<Post> posts = queryFactory
                 .selectFrom(post)
-                .join(post.user, user)
+                .join(post.user, user).fetchJoin()
                 .where(user.major.eq(major))
+                .orderBy(getOrderSpecifier(sortBy, post))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
                 .fetch();
+
+        List<PostPreviewResponse> content = posts.stream()
+                .filter(post -> !post.getIsDeleted())
+                .map(PostPreviewResponse::of)
+                .toList();
+
+        boolean hasNext = content.size() > pageable.getPageSize();
+        if (hasNext) {
+            content = content.subList(0, pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
     @Override
