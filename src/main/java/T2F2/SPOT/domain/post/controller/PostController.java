@@ -81,17 +81,19 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "Filtered and sorted posts returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public Slice<QPostDto> getSearchAndFilterAndSortPosts(
+    public ResponseEntity<SliceSearchPostResponse<PostPreviewResponse>> getSearchAndFilterAndSortPosts(
+            @RequestParam(required = true) int limit,
+            @RequestParam(defaultValue = "0") int startIndex,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) PostStatus postStatus,
             @RequestParam(required = false) PostFor postFor,
             @RequestParam(defaultValue = "0") int minPrice,
             @RequestParam(defaultValue = "1000000") int maxPrice,
-            @RequestParam(required = false) SortBy sortBy,
-            @RequestParam(defaultValue = "0") int startIndex
+            @RequestParam(required = false) SortBy sortBy
             ) {
-        return postService.getSearchFilterList(keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy, startIndex);
+        Slice<PostPreviewResponse> result = postService.getSearchFilterList(limit, startIndex, keyword, category, postFor, postStatus, minPrice, maxPrice, sortBy);
+        return ResponseEntity.ok(new SliceSearchPostResponse<>(result));
     }
 
 
@@ -101,7 +103,7 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "Posts filtered by major returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<QPostDto> getPostFilterByMajor(
+    public List<PostPreviewResponse> getPostFilterByMajor(
             @PathVariable("major") String major){
 
         return postService.findPostByMajor(major);
@@ -114,7 +116,7 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "Posts filtered by user ID returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<QPostDto> getPostFilterByUserId(
+    public List<PostPreviewResponse> getPostFilterByUserId(
             @PathVariable("userId") Long userId
     ) {
         return postService.findPostByUserId(userId);
