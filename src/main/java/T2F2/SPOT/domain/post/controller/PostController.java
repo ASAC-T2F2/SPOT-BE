@@ -97,16 +97,19 @@ public class PostController {
     }
 
 
-    @GetMapping("/post/feed/major/{major}")
+    @GetMapping("/post/feed/major")
     @Operation(summary = "전공 피드", description = "전공 별, 게시글 목록을 반환하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts filtered by major returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<PostPreviewResponse> getPostFilterByMajor(
-            @PathVariable("major") String major){
-
-        return postService.findPostByMajor(major);
+    public ResponseEntity<SliceSearchPostResponse<PostPreviewResponse>> getPostFilterByMajor(
+            @RequestParam(required = true) int limit,
+            @RequestParam(defaultValue = "0") int startIndex,
+            @RequestParam(required = false) SortBy sortBy
+    ){
+        Slice<PostPreviewResponse> result = postService.getPostByMajor(limit, startIndex, sortBy);
+        return ResponseEntity.ok(new SliceSearchPostResponse<>(result));
     }
 
 
