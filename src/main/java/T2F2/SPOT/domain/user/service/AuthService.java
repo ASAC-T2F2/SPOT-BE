@@ -58,6 +58,12 @@ public class AuthService {
         return userDetails.getUsername();
     }
 
+    public Long getAuthenticatedUserId() {
+        User user = userRepository.findByEmail(getAuthenticatedUserEmail())
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
+        return user.getId();
+    }
+
     /**
      * 회원가입
      * @param joinDTO
