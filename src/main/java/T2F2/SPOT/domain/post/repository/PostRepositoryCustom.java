@@ -1,6 +1,7 @@
 package T2F2.SPOT.domain.post.repository;
 
 import T2F2.SPOT.domain.post.PostFor;
+import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.PostPreviewResponse;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
 import T2F2.SPOT.domain.post.entity.Post;
@@ -14,7 +15,8 @@ public interface PostRepositoryCustom {
             Pageable pageable,
             SearchPostConditionDto searchPostConditionDto
     );
-    List<Post> findByMajor(String major);
+
+    Slice<PostPreviewResponse> findByMajor(Pageable pageable, String major, SortBy sortBy);
 
     List<Post> findByUserId(Long userId);
 

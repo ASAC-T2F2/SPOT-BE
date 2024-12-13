@@ -149,17 +149,17 @@ public class PostService {
 
     /**
      * 전공에 맞는 게시글 반환
-     * @param major
      * @return 내 전공 게시글
      */
     @Transactional(readOnly = true)
-    public List<PostPreviewResponse> findPostByMajor(String major) {
-        return postRepository.findByMajor(major)
-                .stream()
-                .map(post ->
-                        post.getIsDeleted() ? null : PostPreviewResponse.of(post))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+    public Slice<PostPreviewResponse> getPostByMajor(int limit, int startIndex, SortBy sortBy) {
+        String userEmail = authService.getAuthenticatedUserEmail();
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
+        String major = user.getMajor();
+
+        Pageable pageable = PageRequest.of(startIndex, limit);
+
+        return postRepository.findByMajor(pageable, major, sortBy);
     }
 
 
