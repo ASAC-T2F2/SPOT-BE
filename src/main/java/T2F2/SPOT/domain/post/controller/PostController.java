@@ -5,6 +5,7 @@ import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.*;
+import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +26,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final PostRepository postRepository;
 
     @PostMapping("/post/create")
     @Operation(summary = "게시글 생성", description = "입력 값을 받아 게시글을 최초 생성해주는 API")
@@ -70,6 +72,8 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<?> getDetailPost(@PathVariable("id") Long id) {
+        postService.updateViewCount(id);
+
         PostResponse result = postService.getPostDetail(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

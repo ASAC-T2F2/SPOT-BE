@@ -16,7 +16,8 @@ public class PostDetail extends PostResponse {
                 post.getPostStatus(),
                 post.getPrice(),
                 post.getWishes().size(),
-                post.getCreatedDate()
+                post.getCreatedDate(),
+                post.getViewCount()
         );
         this.isAuthor = isAuthor;
     }

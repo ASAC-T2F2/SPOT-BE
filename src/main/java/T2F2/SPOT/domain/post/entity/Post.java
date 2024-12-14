@@ -32,13 +32,16 @@ public class Post extends BaseEntity {
 
     private String content;
 
+    private int price;
+
+    @ColumnDefault("0")
+    private int viewCount;
+
     @Enumerated(EnumType.STRING)
     private PostFor postFor;
 
     @Enumerated(EnumType.STRING)
     private PostStatus postStatus;
-
-    private int price;
 
     @ColumnDefault("FALSE")
     private Boolean isDeleted;

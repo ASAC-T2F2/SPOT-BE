@@ -179,6 +179,16 @@ public class PostService {
 
 
     /**
+     * 조회수 증가 (Native Query를 총해 동시성 문제 해결)
+     * @param postId
+     */
+    @Transactional
+    public void updateViewCount(Long postId) {
+        postRepository.increaseViewCount(postId);
+    }
+
+
+    /**
      * 게시글 상태 변경
      * @param id
      * @param status
