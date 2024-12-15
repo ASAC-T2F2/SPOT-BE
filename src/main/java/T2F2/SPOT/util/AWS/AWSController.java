@@ -18,12 +18,22 @@ public class AWSController {
 
     @GetMapping("/geturl")
     public ResponseEntity<String> getS3Url(@RequestParam String filename) {
+
+        if (filename == null || filename.trim().isEmpty()) {
+            throw new IllegalArgumentException("Filename must not be null or empty");
+        }
+
         String url = awsService.createPresignedGetUrl(filename);
         return ResponseEntity.ok(url);
     }
 
     @GetMapping("/posturl")
     public ResponseEntity<String> getPostUrl(@RequestParam String filename) {
+
+        if (filename == null || filename.trim().isEmpty()) {
+            throw new IllegalArgumentException("Filename must not be null or empty");
+        }
+
         String url = awsService.createPresignedUrl(filename);
         return ResponseEntity.ok(url);
     }

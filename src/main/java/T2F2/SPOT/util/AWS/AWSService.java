@@ -1,5 +1,8 @@
 package T2F2.SPOT.util.AWS;
 
+import T2F2.SPOT.domain.user.service.AuthService;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +17,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,52 +29,57 @@ public class AWSService {
 
     private final S3Client s3Client;
     private final S3Presigner presigner;
+    private final AuthService authService;
 
+    private String generateUniqueFileName(Long userId, String filename) {
+        String uuid = UUID.randomUUID().toString();
+        return userId + "/" + uuid + "_" + filename;
+    }
     public String createPresignedGetUrl(String fileName) {
 
-        if (fileName == null || fileName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Filename must not be null or empty");
-        }
-            GetObjectRequest objectRequest = GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .build();
+        GetObjectRequest objectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
 
-            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(5)) // URL 만료시간
-                    .getObjectRequest(objectRequest)
-                    .build();
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(5)) // URL 만료시간
+                .getObjectRequest(objectRequest)
+                .build();
 
-            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-            log.info("Presigned URL : [{}]", presignedRequest.url().toString());
-            log.info("HTTP method : [{}]", presignedRequest.httpRequest().method());
+        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+        log.info("Presigned URL : [{}]", presignedRequest.url().toString());
+        log.info("HTTP method : [{}]", presignedRequest.httpRequest().method());
 
-            return presignedRequest.url().toExternalForm();
+        return presignedRequest.url().toExternalForm();
     }
 
-    public String createPresignedUrl(String fileName) {
+    public String createPresignedUrl(String filename) {
 
-        if (fileName == null || fileName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Filename must not be null or empty");
+        Long userId = authService.getAuthenticatedUserId();
+        if(userId == null) {
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         }
 
-            PutObjectRequest objectRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(fileName)
-                    .build();
+        String uniqueFileName = generateUniqueFileName(userId, filename);
 
-            PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10))  // The URL expires in 10 minutes.
-                    .putObjectRequest(objectRequest)
-                    .build();
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(uniqueFileName)
+                .build();
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))  // The URL expires in 10 minutes.
+                .putObjectRequest(objectRequest)
+                .build();
 
 
-            PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
-            String myURL = presignedRequest.url().toString();
-            log.info("Presigned URL to upload a file to: [{}]", myURL);
-            log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
+        PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+        String myURL = presignedRequest.url().toString();
+        log.info("Presigned URL to upload a file to: [{}]", myURL);
+        log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
 
-            return presignedRequest.url().toExternalForm();
+        return presignedRequest.url().toExternalForm();
     }
 
 //    public String getPresignUrl(String filename){
