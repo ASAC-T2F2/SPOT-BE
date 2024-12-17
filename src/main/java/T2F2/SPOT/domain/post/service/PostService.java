@@ -88,7 +88,7 @@ public class PostService {
                 .collect(Collectors.toList());
 
         Long lastId = fetchedPosts.isEmpty() ? null : fetchedPosts.get(fetchedPosts.size() - 1).getId();
-        boolean hasMore = postRepository.hasMorePosts(lastPostId, postFor);
+        boolean hasMore = postRepository.hasMorePosts(lastId, postFor);
 
         return PostListWithPagination.of(postResponses, lastId, hasMore);
     }
