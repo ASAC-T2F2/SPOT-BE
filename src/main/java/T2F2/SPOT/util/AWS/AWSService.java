@@ -17,6 +17,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -26,32 +28,41 @@ public class AWSService {
 
     @Value("${AWS_S3_BUCKET}")
     private String bucketName;
+    @Value("${CLOUDFRONT_DOMAIN}")
+    private String cloudFrontDomain;
 
     private final S3Client s3Client;
     private final S3Presigner presigner;
     private final AuthService authService;
 
-    private String generateUniqueFileName(Long userId, String filename) {
+    public String generateUniqueFileName(Long userId, String filename) {
         String uuid = UUID.randomUUID().toString();
         return userId + "/" + uuid + "_" + filename;
     }
-    public String createPresignedGetUrl(String fileName) {
+//    public String createPresignedGetUrl(String fileName) {
+//
+//        GetObjectRequest objectRequest = GetObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(fileName)
+//                .build();
+//
+//        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+//                .signatureDuration(Duration.ofMinutes(5)) // URL 만료시간
+//                .getObjectRequest(objectRequest)
+//                .build();
+//
+//        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+//        log.info("Presigned URL : [{}]", presignedRequest.url().toString());
+//        log.info("HTTP method : [{}]", presignedRequest.httpRequest().method());
+//
+//        return presignedRequest.url().toExternalForm();
+//    }
 
-        GetObjectRequest objectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(fileName)
-                .build();
+    public String getCloudFrontUrl(String filename) {
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5)) // URL 만료시간
-                .getObjectRequest(objectRequest)
-                .build();
-
-        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-        log.info("Presigned URL : [{}]", presignedRequest.url().toString());
-        log.info("HTTP method : [{}]", presignedRequest.httpRequest().method());
-
-        return presignedRequest.url().toExternalForm();
+        String cloudFrontUrl = String.format("https://%s/%s", cloudFrontDomain, filename);
+        log.info("CloudFront URL: [{}]", cloudFrontUrl);
+        return cloudFrontUrl;
     }
 
     public String createPresignedUrl(String filename) {
@@ -63,9 +74,14 @@ public class AWSService {
 
         String uniqueFileName = generateUniqueFileName(userId, filename);
 
+//        Map<String, String> metadata = new HashMap<>();
+//        metadata.put("Cache-Control", "max-age=31536000, immutable");
+
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(uniqueFileName)
+                .cacheControl("max-age=31536000, immutable")
+//                .metadata(metadata)
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()

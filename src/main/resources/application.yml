@@ -44,6 +44,8 @@ spring:
       stack:
         auto: false
 
+  cloudfront:
+   domain: ${CLOUDFRONT_DOMAIN}
 # # Redis
 #  data:
 #    redis:
