@@ -129,6 +129,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .from(post)
                 .where(post.postFor.eq(postFor)
                         .and(post.id.lt(lastPostId)))
+                .limit(1)
                 .fetchFirst() != null;
     }
 }

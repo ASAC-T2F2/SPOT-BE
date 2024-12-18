@@ -88,7 +88,7 @@ public class PostService {
                 .collect(Collectors.toList());
 
         Long lastId = fetchedPosts.isEmpty() ? null : fetchedPosts.get(fetchedPosts.size() - 1).getId();
-        boolean hasMore = postRepository.hasMorePosts(lastPostId, postFor);
+        boolean hasMore = postRepository.hasMorePosts(lastId, postFor);
 
         return PostListWithPagination.of(postResponses, lastId, hasMore);
     }
@@ -175,6 +175,16 @@ public class PostService {
                         post.getIsDeleted() ? null : PostPreviewResponse.of(post))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 조회수 증가 (Native Query를 총해 동시성 문제 해결)
+     * @param postId
+     */
+    @Transactional
+    public void updateViewCount(Long postId) {
+        postRepository.increaseViewCount(postId);
     }
 
 

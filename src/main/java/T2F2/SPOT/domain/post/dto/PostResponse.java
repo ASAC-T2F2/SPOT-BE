@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PostResponse {
 
+    private final Long postId;
     private final String title;
     private final String content;
     private final String userNickname;
@@ -19,8 +20,10 @@ public class PostResponse {
     private final int price;
     private final int wish_count;
     private final LocalDateTime post_date;
+    private final int viewCount;
 
-    public PostResponse(String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date) {
+    public PostResponse(Long postId, String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date, int viewCount) {
+        this.postId = postId;
         this.title = title;
         this.content = content;
         this.userNickname = user.getNickname();
@@ -29,18 +32,21 @@ public class PostResponse {
         this.price = price;
         this.wish_count = wish_count;
         this.post_date = post_date;
+        this.viewCount = viewCount;
     }
 
     public static PostResponse of(Post post) {
 
         return new PostResponse(
+                post.getId(),
                 post.getTitle(),
                 post.getContent(),
                 post.getUser(),
                 post.getPostStatus(),
                 post.getPrice(),
                 post.getWishes().size(),
-                post.getCreatedDate()
+                post.getCreatedDate(),
+                post.getViewCount()
         );
     }
 }

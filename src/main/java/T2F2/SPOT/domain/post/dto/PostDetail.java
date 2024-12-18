@@ -10,13 +10,15 @@ public class PostDetail extends PostResponse {
 
     private PostDetail(Post post, boolean isAuthor) {
         super(
+                post.getId(),
                 post.getTitle(),
                 post.getContent(),
                 post.getUser(),
                 post.getPostStatus(),
                 post.getPrice(),
                 post.getWishes().size(),
-                post.getCreatedDate()
+                post.getCreatedDate(),
+                post.getViewCount()
         );
         this.isAuthor = isAuthor;
     }
