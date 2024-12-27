@@ -1,5 +1,8 @@
 package T2F2.SPOT.util.AWS;
 
+import T2F2.SPOT.domain.user.service.AuthService;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +17,9 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -22,51 +28,117 @@ public class AWSService {
 
     @Value("${AWS_S3_BUCKET}")
     private String bucketName;
+    @Value("${CLOUDFRONT_DOMAIN}")
+    private String cloudFrontDomain;
 
     private final S3Client s3Client;
     private final S3Presigner presigner;
+    private final AuthService authService;
 
-    public String getPresignUrl(String filename){
-        if(filename == null || filename.equals("")) {
-            return null;
+    public String generateUniqueFileName(Long userId, String filename) {
+        String uuid = UUID.randomUUID().toString();
+        return userId + "/" + uuid + "_" + filename;
+    }
+//    public String createPresignedGetUrl(String fileName) {
+//
+//        GetObjectRequest objectRequest = GetObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(fileName)
+//                .build();
+//
+//        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+//                .signatureDuration(Duration.ofMinutes(5)) // URL 만료시간
+//                .getObjectRequest(objectRequest)
+//                .build();
+//
+//        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+//        log.info("Presigned URL : [{}]", presignedRequest.url().toString());
+//        log.info("HTTP method : [{}]", presignedRequest.httpRequest().method());
+//
+//        return presignedRequest.url().toExternalForm();
+//    }
+
+    public String getCloudFrontUrl(String filename) {
+
+        String cloudFrontUrl = String.format("https://%s/%s", cloudFrontDomain, filename);
+        log.info("CloudFront URL: [{}]", cloudFrontUrl);
+        return cloudFrontUrl;
+    }
+
+    public String createPresignedUrl(String filename) {
+
+        Long userId = authService.getAuthenticatedUserId();
+        if(userId == null) {
+            throw new CustomException(UserErrorCode.NOT_FOUND);
         }
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        String uniqueFileName = generateUniqueFileName(userId, filename);
+
+//        Map<String, String> metadata = new HashMap<>();
+//        metadata.put("Cache-Control", "max-age=31536000, immutable");
+
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(filename)
-                .build();
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(filename)
+                .key(uniqueFileName)
+                .cacheControl("max-age=31536000, immutable")
+//                .metadata(metadata)
                 .build();
 
-        log.info(getObjectRequest.toString());
-        log.info(putObjectRequest.toString());
-
-        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5)) // presignedURL 5분간 접근 허용
-                .getObjectRequest(getObjectRequest)
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))  // The URL expires in 10 minutes.
+                .putObjectRequest(objectRequest)
                 .build();
 
-        PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(5))
-                .putObjectRequest(putObjectRequest)
-                .build();
 
-        log.info(getObjectPresignRequest.toString());
-        log.info(putObjectPresignRequest.toString());
+        PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+        String myURL = presignedRequest.url().toString();
+        log.info("Presigned URL to upload a file to: [{}]", myURL);
+        log.info("HTTP method: [{}]", presignedRequest.httpRequest().method());
 
-        PresignedGetObjectRequest presignedGetObjectRequest = presigner
-                .presignGetObject(getObjectPresignRequest);
-
-        PresignedPutObjectRequest presignedPutObjectRequest = presigner
-                .presignPutObject(putObjectPresignRequest);
-
-        String url = presignedPutObjectRequest.url().toString();
-//        String url = presignedGetObjectRequest.url().toString();
-        log.info(url);
-//        presigner.close(); // presigner를 닫고 획득한 모든 리소스를 해제
-        return url;
+        return presignedRequest.url().toExternalForm();
     }
+
+//    public String getPresignUrl(String filename){
+//        if(filename == null || filename.equals("")) {
+//            return null;
+//        }
+//
+//        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(filename)
+//                .build();
+//        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+//                .bucket(bucketName)
+//                .key(filename)
+//                .build();
+//
+//        log.info(getObjectRequest.toString());
+//        log.info(putObjectRequest.toString());
+//
+//        GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+//                .signatureDuration(Duration.ofMinutes(5)) // presignedURL 5분간 접근 허용
+//                .getObjectRequest(getObjectRequest)
+//                .build();
+//
+//        PutObjectPresignRequest putObjectPresignRequest = PutObjectPresignRequest.builder()
+//                .signatureDuration(Duration.ofMinutes(5))
+//                .putObjectRequest(putObjectRequest)
+//                .build();
+//
+//        log.info(getObjectPresignRequest.toString());
+//        log.info(putObjectPresignRequest.toString());
+//
+//        PresignedGetObjectRequest presignedGetObjectRequest = presigner
+//                .presignGetObject(getObjectPresignRequest);
+//
+//        PresignedPutObjectRequest presignedPutObjectRequest = presigner
+//                .presignPutObject(putObjectPresignRequest);
+//
+//        String url = presignedPutObjectRequest.url().toString();
+////        String url = presignedGetObjectRequest.url().toString();
+//        log.info(url);
+////        presigner.close(); // presigner를 닫고 획득한 모든 리소스를 해제
+//        return url;
+//    }
 
 }

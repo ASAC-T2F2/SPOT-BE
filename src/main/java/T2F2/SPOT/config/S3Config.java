@@ -26,6 +26,7 @@ public class S3Config {
         return AwsBasicCredentials.create(accessKey, secretKey);
     }
 
+    //클라이언트가 S3와 직접 상호작용하도록 지원
     @Bean
     public S3Presigner s3Presigner(AwsCredentials awsCredentials) {
         return S3Presigner.builder()
@@ -34,6 +35,7 @@ public class S3Config {
                 .build();
     }
 
+    //서버에서 S3에 직 작업이 필요할 때 사용
     @Bean
     public S3Client s3Client (AwsCredentials awsCredentials) {
         return S3Client.builder()
