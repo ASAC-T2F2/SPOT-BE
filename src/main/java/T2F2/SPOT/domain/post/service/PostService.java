@@ -192,11 +192,10 @@ public class PostService {
 
     /**
      * 게시글 상태 변경
-     * @param id
+     * @param findPost
      * @param status
      */
-    public void updateStatus(Long id, String status) {
-        Post findPost = postRepository.findById(id).orElseThrow();
+    public void updateStatus(Post findPost, String status) {
         if(findPost.getIsDeleted())
         {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
@@ -211,7 +210,7 @@ public class PostService {
      * @param modifyPostDto
      */
     public void modifyPost(Long id, ModifyPostDto modifyPostDto) {
-        Post findPost = postRepository.findById(id).orElseThrow();
+        Post findPost = postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
         if(findPost.getIsDeleted())
         {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);

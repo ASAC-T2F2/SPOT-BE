@@ -5,8 +5,11 @@ import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.*;
+import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.post.service.PostService;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.PostErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -139,11 +142,14 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "Post not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public void updateStatus(
+    public ResponseEntity<String> updateStatus(
             @PathVariable("id") Long id,
             @PathVariable("status") String status
     ) {
-        postService.updateStatus(id, status);
+        Post findPost = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+        postService.updateStatus(findPost, status);
+        return ResponseEntity.ok("Post status updated successfully");
     }
 
 
