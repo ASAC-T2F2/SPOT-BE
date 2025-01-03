@@ -34,10 +34,11 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "Post created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public void createPost(
+    public ResponseEntity<Long> createPost(
             @RequestBody CreatePostDto createPostDto
     ) {
-        postService.createPost(createPostDto);
+        Long post = postService.createPost(createPostDto);
+        return ResponseEntity.ok(post);
     }
 
 

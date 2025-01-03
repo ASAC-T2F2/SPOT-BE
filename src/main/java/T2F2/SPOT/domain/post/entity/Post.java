@@ -66,14 +66,14 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 
-    private Post(String title, String content, PostFor postFor, PostStatus postStatus, int price, User user) {
+    private Post(String title, String content, PostFor postFor, int price, User user) {
         this.title = title;
         this.content = content;
         this.postFor = postFor;
-        this.postStatus = postStatus;
         this.price = price;
         this.user = user;
         this.isDeleted = false;
+        this.postStatus = PostStatus.TRADING;
     }
 
 
@@ -82,7 +82,6 @@ public class Post extends BaseEntity {
                 createPostDto.getTitle(),
                 createPostDto.getContent(),
                 createPostDto.getPostFor(),
-                createPostDto.getPostStatus(),
                 createPostDto.getPrice(),
                 user
         );

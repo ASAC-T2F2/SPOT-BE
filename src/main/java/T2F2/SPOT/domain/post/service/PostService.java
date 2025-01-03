@@ -50,9 +50,11 @@ public class PostService {
      * 게시글 생성 로직
      * @param createPostDto
      */
-    public void createPost(CreatePostDto createPostDto) {
-        User findUser = userRepository.findById(createPostDto.getUserId()).orElseThrow();
+    public Long  createPost(CreatePostDto createPostDto) {
+        User findUser = userRepository.findById(authService.getAuthenticatedUserId())
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         Post result = postRepository.save(Post.of(createPostDto, findUser));
+        return result.getId();
     }
 
 
