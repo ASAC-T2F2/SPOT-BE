@@ -13,7 +13,8 @@ public enum UserErrorCode implements ErrorCode {
     NICKNAME_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 존재하는 닉네임입니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자를 찾을 수 없습니다."),
     SAME_PASSWORD_INPUT(HttpStatus.BAD_REQUEST, "기존 비밀번호와 동일합니다."),
-    UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "사용자 인증에 실패했습니다.");
+    UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "사용자 인증에 실패했습니다."),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "권한이 없는 사용자입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

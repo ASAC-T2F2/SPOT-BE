@@ -18,5 +18,5 @@ public class CreatePostDto {
     private PostFor postFor;
 //    private PostStatus postStatus;
     private int price;
-    private List<PostImage> postImages;
+    private List<String> imageUrls;
 }

@@ -121,16 +121,14 @@ public class PostController {
     }
 
 
-    @GetMapping("/post/feed/user/{userId}")
+    @GetMapping("/post/feed/user")
     @Operation(summary = "내가 올린 피드", description = "내가 올린 게시글 목록을 반환하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts filtered by user ID returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<PostPreviewResponse> getPostFilterByUserId(
-            @PathVariable("userId") Long userId
-    ) {
-        return postService.findPostByUserId(userId);
+    public ResponseEntity<List<PostPreviewResponse>> getPostFilterByUserId() {
+        return ResponseEntity.ok(postService.findPostByUserId());
     }
 
 
@@ -146,8 +144,7 @@ public class PostController {
             @PathVariable("id") Long id,
             @PathVariable("status") String status
     ) {
-        Post findPost = postRepository.findById(id)
-                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+        Post findPost = postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
         postService.updateStatus(findPost, status);
         return ResponseEntity.ok("Post status updated successfully");
     }
@@ -167,5 +164,17 @@ public class PostController {
     )
     {
         postService.modifyPost(id, modifyPostDto);
+    }
+
+    @DeleteMapping("/post/delete/{id}")
+    @Operation(summary = "게시글 삭제", description = "게시글을 soft delete하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "User is an unauthorized user"),
+            @ApiResponse(responseCode = "404", description = "Post not found")
+    })
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return new ResponseEntity<>("Post deleted successfully", HttpStatus.OK);
     }
 }
