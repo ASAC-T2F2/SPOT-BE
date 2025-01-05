@@ -1,7 +1,7 @@
 package T2F2.SPOT.domain.post.entity;
 
-import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
+import T2F2.SPOT.domain.post.Category;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.dto.CreatePostDto;
@@ -46,8 +46,7 @@ public class Post extends BaseEntity {
     @ColumnDefault("FALSE")
     private Boolean isDeleted;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -66,11 +65,12 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 
-    private Post(String title, String content, PostFor postFor, int price, User user) {
+    private Post(String title, String content, PostFor postFor, int price, Category category, User user) {
         this.title = title;
         this.content = content;
         this.postFor = postFor;
         this.price = price;
+        this.category = category;
         this.user = user;
         this.isDeleted = false;
         this.postStatus = PostStatus.TRADING;
@@ -83,6 +83,7 @@ public class Post extends BaseEntity {
                 createPostDto.getContent(),
                 createPostDto.getPostFor(),
                 createPostDto.getPrice(),
+                createPostDto.getCategory(),
                 user
         );
     }

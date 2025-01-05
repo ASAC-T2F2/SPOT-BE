@@ -1,6 +1,6 @@
 package T2F2.SPOT.domain.post.service;
 
-import T2F2.SPOT.domain.category.entity.Category;
+import T2F2.SPOT.domain.post.Category;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
