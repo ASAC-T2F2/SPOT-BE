@@ -1,7 +1,7 @@
 package T2F2.SPOT.domain.post.entity;
 
-import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.note.entity.NoteRoom;
+import T2F2.SPOT.domain.post.Category;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.dto.CreatePostDto;
@@ -46,8 +46,7 @@ public class Post extends BaseEntity {
     @ColumnDefault("FALSE")
     private Boolean isDeleted;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
@@ -66,14 +65,15 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post")
     private List<NoteRoom> noteRooms = new ArrayList<>();
 
-    private Post(String title, String content, PostFor postFor, PostStatus postStatus, int price, User user) {
+    private Post(String title, String content, PostFor postFor, int price, Category category, User user) {
         this.title = title;
         this.content = content;
         this.postFor = postFor;
-        this.postStatus = postStatus;
         this.price = price;
+        this.category = category;
         this.user = user;
         this.isDeleted = false;
+        this.postStatus = PostStatus.TRADING;
     }
 
 
@@ -82,8 +82,8 @@ public class Post extends BaseEntity {
                 createPostDto.getTitle(),
                 createPostDto.getContent(),
                 createPostDto.getPostFor(),
-                createPostDto.getPostStatus(),
                 createPostDto.getPrice(),
+                createPostDto.getCategory(),
                 user
         );
     }
@@ -99,7 +99,10 @@ public class Post extends BaseEntity {
     public void modifyPost(ModifyPostDto modifyPostDto) {
         this.title = modifyPostDto.getTitle();
         this.content = modifyPostDto.getContent();
+        this.postFor = modifyPostDto.getPostFor();
+        this.postStatus = modifyPostDto.getPostStatus();
         this.price = modifyPostDto.getPrice();
+        this.category = modifyPostDto.getCategory();
 
     }
 

@@ -1,6 +1,5 @@
 package T2F2.SPOT.domain.post;
 
-import T2F2.SPOT.domain.category.entity.Category;
 import T2F2.SPOT.domain.post.dto.SearchPostConditionDto;
 import T2F2.SPOT.domain.post.entity.QPost;
 import com.querydsl.core.BooleanBuilder;
@@ -57,8 +56,8 @@ public class PostQueryHelper {
     // 카테고리 분류
     private static void addCatecory(Category category, BooleanBuilder condition, QPost post){
         if (category != null) {
-            condition.andAnyOf(
-                    post.category.categoryName.eq(category.getCategoryName())
+            condition.and(
+                    post.category.eq(category)
             );
         }
     }

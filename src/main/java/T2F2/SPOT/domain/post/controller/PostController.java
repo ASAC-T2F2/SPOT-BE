@@ -1,12 +1,15 @@
 package T2F2.SPOT.domain.post.controller;
 
-import T2F2.SPOT.domain.category.entity.Category;
+import T2F2.SPOT.domain.post.Category;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.*;
+import T2F2.SPOT.domain.post.entity.Post;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.post.service.PostService;
+import T2F2.SPOT.util.exception.CustomException;
+import T2F2.SPOT.util.exception.error_code.PostErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,10 +37,11 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "Post created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public void createPost(
+    public ResponseEntity<Long> createPost(
             @RequestBody CreatePostDto createPostDto
     ) {
-        postService.createPost(createPostDto);
+        Long post = postService.createPost(createPostDto);
+        return ResponseEntity.ok(post);
     }
 
 
@@ -117,16 +121,14 @@ public class PostController {
     }
 
 
-    @GetMapping("/post/feed/user/{userId}")
+    @GetMapping("/post/feed/user")
     @Operation(summary = "내가 올린 피드", description = "내가 올린 게시글 목록을 반환하는 API")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Posts filtered by user ID returned successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public List<PostPreviewResponse> getPostFilterByUserId(
-            @PathVariable("userId") Long userId
-    ) {
-        return postService.findPostByUserId(userId);
+    public ResponseEntity<List<PostPreviewResponse>> getPostFilterByUserId() {
+        return ResponseEntity.ok(postService.findPostByUserId());
     }
 
 
@@ -138,11 +140,13 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "Post not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public void updateStatus(
+    public ResponseEntity<String> updateStatus(
             @PathVariable("id") Long id,
             @PathVariable("status") String status
     ) {
-        postService.updateStatus(id, status);
+        Post findPost = postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+        postService.updateStatus(findPost, status);
+        return ResponseEntity.ok("Post status updated successfully");
     }
 
 
@@ -151,14 +155,29 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post modified successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "403", description = "권한이 없는 사용자입니다."),
+            @ApiResponse(responseCode = "404", description = "해당 게시글을 찾지 못했습니다."),
+            @ApiResponse(responseCode = "410", description = "이미 삭제된 게시물입니다."),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public void modifyPost(
+    public ResponseEntity<String> modifyPost(
             @PathVariable("id") Long id,
             @RequestBody ModifyPostDto modifyPostDto
     )
     {
         postService.modifyPost(id, modifyPostDto);
+        return ResponseEntity.ok("Post modified successfully");
+    }
+
+    @DeleteMapping("/post/delete/{id}")
+    @Operation(summary = "게시글 삭제", description = "게시글을 soft delete하는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Post deleted successfully"),
+            @ApiResponse(responseCode = "403", description = "User is an unauthorized user"),
+            @ApiResponse(responseCode = "404", description = "Post not found")
+    })
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return new ResponseEntity<>("Post deleted successfully", HttpStatus.OK);
     }
 }

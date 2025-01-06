@@ -1,11 +1,13 @@
 package T2F2.SPOT.domain.post.service;
 
-import T2F2.SPOT.domain.category.entity.Category;
+import T2F2.SPOT.domain.post.Category;
 import T2F2.SPOT.domain.post.PostFor;
 import T2F2.SPOT.domain.post.PostStatus;
 import T2F2.SPOT.domain.post.SortBy;
 import T2F2.SPOT.domain.post.dto.*;
 import T2F2.SPOT.domain.post.entity.Post;
+import T2F2.SPOT.domain.post.entity.PostImage;
+import T2F2.SPOT.domain.post.repository.PostImageRepository;
 import T2F2.SPOT.domain.post.repository.PostRepository;
 import T2F2.SPOT.domain.user.entity.User;
 import T2F2.SPOT.domain.user.repository.UserRepository;
@@ -34,6 +36,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final AuthService authService;
+    private final PostImageRepository postImageRepository;
 
     /**
      * PostId 기반 게시글 가져오기
@@ -50,9 +53,20 @@ public class PostService {
      * 게시글 생성 로직
      * @param createPostDto
      */
-    public void createPost(CreatePostDto createPostDto) {
-        User findUser = userRepository.findById(createPostDto.getUserId()).orElseThrow();
-        Post result = postRepository.save(Post.of(createPostDto, findUser));
+    public Long  createPost(CreatePostDto createPostDto) {
+        User findUser = userRepository.findById(authService.getAuthenticatedUserId())
+                .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
+        Post post = postRepository.save(Post.of(createPostDto, findUser));
+
+        List<PostImage> postImages = createPostDto.getImageUrls().stream()
+                .map(url -> PostImage.builder()
+                        .post(post)
+                        .imageUrl(url)
+                        .build())
+                .collect(Collectors.toList());
+
+        postImageRepository.saveAll(postImages);
+        return post.getId();
     }
 
 
@@ -165,10 +179,12 @@ public class PostService {
 
     /**
      * 사용자 Id 기반 게시글 반환
-     * @param userId
      * @return 게시글
      */
-    public List<PostPreviewResponse> findPostByUserId(Long userId) {
+    public List<PostPreviewResponse> findPostByUserId() {
+
+        Long userId = authService.getAuthenticatedUserId();
+
         return postRepository.findByUserId(userId)
                 .stream()
                 .map(post ->
@@ -190,11 +206,10 @@ public class PostService {
 
     /**
      * 게시글 상태 변경
-     * @param id
+     * @param findPost
      * @param status
      */
-    public void updateStatus(Long id, String status) {
-        Post findPost = postRepository.findById(id).orElseThrow();
+    public void updateStatus(Post findPost, String status) {
         if(findPost.getIsDeleted())
         {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
@@ -209,11 +224,18 @@ public class PostService {
      * @param modifyPostDto
      */
     public void modifyPost(Long id, ModifyPostDto modifyPostDto) {
-        Post findPost = postRepository.findById(id).orElseThrow();
+        Post findPost = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+
+        if(!isAuthor(findPost.getUser().getId())) {
+            throw new CustomException(UserErrorCode.FORBIDDEN);
+        }
+
         if(findPost.getIsDeleted())
         {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
+
         findPost.modifyPost(modifyPostDto);
     }
 
@@ -229,5 +251,21 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
 
         return Objects.equals(user.getId(), writerId);
+    }
+
+    /**
+     * softdelete로 상태변경
+     * @param postId
+     */
+    public void deletePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+
+        if(!post.getUser().getId().equals(authService.getAuthenticatedUserId())){
+            throw new CustomException(UserErrorCode.FORBIDDEN);
+        }
+
+        post.updatePostStatus("DELETE");
+        postRepository.save(post);
     }
 }
