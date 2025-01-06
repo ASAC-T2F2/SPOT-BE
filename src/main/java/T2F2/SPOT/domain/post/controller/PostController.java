@@ -155,15 +155,18 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post modified successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input"),
-            @ApiResponse(responseCode = "404", description = "Post not found"),
+            @ApiResponse(responseCode = "403", description = "권한이 없는 사용자입니다."),
+            @ApiResponse(responseCode = "404", description = "해당 게시글을 찾지 못했습니다."),
+            @ApiResponse(responseCode = "410", description = "이미 삭제된 게시물입니다."),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public void modifyPost(
+    public ResponseEntity<String> modifyPost(
             @PathVariable("id") Long id,
             @RequestBody ModifyPostDto modifyPostDto
     )
     {
         postService.modifyPost(id, modifyPostDto);
+        return ResponseEntity.ok("Post modified successfully");
     }
 
     @DeleteMapping("/post/delete/{id}")

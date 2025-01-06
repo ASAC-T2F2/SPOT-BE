@@ -224,11 +224,18 @@ public class PostService {
      * @param modifyPostDto
      */
     public void modifyPost(Long id, ModifyPostDto modifyPostDto) {
-        Post findPost = postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+        Post findPost = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+
+        if(!isAuthor(findPost.getUser().getId())) {
+            throw new CustomException(UserErrorCode.FORBIDDEN);
+        }
+
         if(findPost.getIsDeleted())
         {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
+
         findPost.modifyPost(modifyPostDto);
     }
 

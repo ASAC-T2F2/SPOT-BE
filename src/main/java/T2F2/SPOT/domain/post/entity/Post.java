@@ -99,7 +99,10 @@ public class Post extends BaseEntity {
     public void modifyPost(ModifyPostDto modifyPostDto) {
         this.title = modifyPostDto.getTitle();
         this.content = modifyPostDto.getContent();
+        this.postFor = modifyPostDto.getPostFor();
+        this.postStatus = modifyPostDto.getPostStatus();
         this.price = modifyPostDto.getPrice();
+        this.category = modifyPostDto.getCategory();
 
     }
 
