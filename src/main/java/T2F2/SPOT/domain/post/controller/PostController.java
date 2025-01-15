@@ -169,6 +169,18 @@ public class PostController {
         return ResponseEntity.ok("Post modified successfully");
     }
 
+    @GetMapping("/post/before/{id}")
+    @Operation(summary = "게시글 수정 전 정보", description = "수정할 게시글의 기존 정보를 보여주는 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Before modified post"),
+            @ApiResponse(responseCode = "404", description = "해당 게시글을 찾지 못했습니다."),
+            @ApiResponse(responseCode = "410", description = "이미 삭제된 게시물입니다.")
+    })
+    public ResponseEntity<ModifyPostDto> beforePost(@PathVariable("id") Long id){
+        ModifyPostDto response = postService.beforePost(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @DeleteMapping("/post/delete/{id}")
     @Operation(summary = "게시글 삭제", description = "게시글을 soft delete하는 API")
     @ApiResponses(value = {

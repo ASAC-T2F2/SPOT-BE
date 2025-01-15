@@ -247,6 +247,27 @@ public class PostService {
         findPost.modifyPost(modifyPostDto);
     }
 
+    public ModifyPostDto beforePost(Long id) {
+
+        Post beforePost = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+
+        if(beforePost.getIsDeleted())
+        {
+            throw new CustomException(PostErrorCode.ALREADY_DELETED);
+        }
+
+        return new ModifyPostDto(
+                beforePost.getTitle(),
+                beforePost.getContent(),
+                beforePost.getPostFor(),
+                beforePost.getPostStatus(),
+                beforePost.getPrice(),
+                beforePost.getCategory()
+        );
+
+    }
+
 
     /**
      * 내가 작성한 게시글인지 확인
