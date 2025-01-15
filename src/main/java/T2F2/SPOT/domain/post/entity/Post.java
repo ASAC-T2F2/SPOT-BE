@@ -108,6 +108,10 @@ public class Post extends BaseEntity {
 
 
     public String getFirstImageOrDefault() {
-        return postImages.isEmpty() ? "default" : postImages.get(0).toString();
+        return postImages.isEmpty() ? "default" : postImages.get(0).getImageUrl();
+    }
+
+    public void addPostImage(PostImage postImage) {
+        this.postImages.add(postImage);
     }
 }

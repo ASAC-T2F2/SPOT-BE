@@ -21,8 +21,9 @@ public class PostResponse {
     private final int wish_count;
     private final LocalDateTime post_date;
     private final int viewCount;
+    private final String firstImageUrl;
 
-    public PostResponse(Long postId, String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date, int viewCount) {
+    public PostResponse(Long postId, String title, String content, User user, PostStatus postStatus, int price, int wish_count, LocalDateTime post_date, int viewCount, String firstImageUrl) {
         this.postId = postId;
         this.title = title;
         this.content = content;
@@ -33,9 +34,10 @@ public class PostResponse {
         this.wish_count = wish_count;
         this.post_date = post_date;
         this.viewCount = viewCount;
+        this.firstImageUrl = firstImageUrl;
     }
 
-    public static PostResponse of(Post post) {
+    public static PostResponse of(Post post, String firstImageUrl) {
 
         return new PostResponse(
                 post.getId(),
@@ -46,7 +48,8 @@ public class PostResponse {
                 post.getPrice(),
                 post.getWishes().size(),
                 post.getCreatedDate(),
-                post.getViewCount()
+                post.getViewCount(),
+                firstImageUrl
         );
     }
 }
