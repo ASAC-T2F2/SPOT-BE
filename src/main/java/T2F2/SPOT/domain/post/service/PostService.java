@@ -58,14 +58,15 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.NOT_FOUND));
         Post post = postRepository.save(Post.of(createPostDto, findUser));
 
-        List<PostImage> postImages = createPostDto.getImageUrls().stream()
-                .map(url -> PostImage.builder()
-                        .post(post)
-                        .imageUrl(url)
-                        .build())
-                .collect(Collectors.toList());
+        createPostDto.getImageUrls().forEach(url -> {
+            PostImage postImage = PostImage.builder()
+                    .post(post)
+                    .imageUrl(url)
+                    .build();
+            post.addPostImage(postImage);
+        });
 
-        postImageRepository.saveAll(postImages);
+        postRepository.save(post);
         return post.getId();
     }
 
@@ -76,10 +77,12 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public List<PostResponse> findAllPost() {
-        return postRepository.findAll()
-                .stream()
+
+        List<Post> posts = postRepository.findAllWithImages();
+
+        return posts.stream()
                 .map(post ->
-                        post.getIsDeleted() ? null : PostResponse.of(post))
+                        post.getIsDeleted() ? null : PostResponse.of(post, post.getFirstImageOrDefault()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
@@ -98,7 +101,10 @@ public class PostService {
         List<Post> fetchedPosts = postRepository.fetchPostsForPurposeSorted(limit, lastPostId, postFor);
 
         List<PostResponse> postResponses = fetchedPosts.stream()
-                .map(PostResponse::of)
+                .map(post -> {
+                    String firstImageUrl = post.getPostImages().isEmpty() ? "default" : post.getPostImages().get(0).getImageUrl();
+                    return PostResponse.of(post, firstImageUrl);
+                })
                 .collect(Collectors.toList());
 
         Long lastId = fetchedPosts.isEmpty() ? null : fetchedPosts.get(fetchedPosts.size() - 1).getId();
@@ -115,7 +121,8 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public PostResponse getPostDetail(Long id) {
-        Post findPost = postRepository.findById(id).orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
+        Post findPost = postRepository.findById(id)
+                .orElseThrow(() -> new CustomException(PostErrorCode.NOT_FOUND));
 
         if(findPost.getIsDeleted())
         {
@@ -123,7 +130,8 @@ public class PostService {
         }
 
         boolean isAuthor = isAuthor(findPost.getUser().getId());
-        return PostDetail.of(findPost, isAuthor);
+        List<PostImage> images = findPost.getPostImages();
+        return PostDetail.of(findPost, isAuthor, images);
     }
 
 
