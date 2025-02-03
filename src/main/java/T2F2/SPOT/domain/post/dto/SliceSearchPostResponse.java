@@ -7,11 +7,11 @@ import java.util.List;
 
 @Getter
 public class SliceSearchPostResponse<T> {
-    private final List<T> content;
+    private final List<T> posts;
     private final boolean hasNext;
 
     public SliceSearchPostResponse(Slice<T> slice) {
-        this.content = slice.getContent();
+        this.posts = slice.getContent();
         this.hasNext = slice.hasNext();
     }
 }
