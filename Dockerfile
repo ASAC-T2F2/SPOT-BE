@@ -1,9 +1,10 @@
 FROM amazoncorretto:17-alpine
 
-COPY src /app/src
+# 작업 디렉토리 설정
+WORKDIR /app
 
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+# 빌드된 JAR 파일 복사
+COPY build/libs/SPOT-*.jar app.jar
 
-#애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# .env 파일로부터 환경 변수를 로드하도록 ENTRYPOINT 설정
+ENTRYPOINT ["sh", "-c", "java -jar app.jar"]

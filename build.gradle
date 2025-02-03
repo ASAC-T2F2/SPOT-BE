@@ -64,6 +64,19 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+tasks.getByName('jar') {
+	enabled = false
+}
+
+def date = new Date().format("yyyyMMdd-HHmm")
+
+tasks.named('bootJar') {
+	jar {
+		archiveBaseName.set("app")
+		archiveVersion.set("1.0.0-${date}")
+	}
+}
+
 clean {
 	delete file('src/main/generated')
 }
