@@ -1,7 +1,6 @@
 package T2F2.SPOT.domain.post.dto;
 
 import lombok.Getter;
-
 import java.util.List;
 
 @Getter
