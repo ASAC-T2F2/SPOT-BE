@@ -39,3 +39,4 @@ out/
 ### deploy ###
 *.tar.gz
 spot.env
+.DS_Store
