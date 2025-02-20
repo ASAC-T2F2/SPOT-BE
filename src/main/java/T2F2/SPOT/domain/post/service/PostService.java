@@ -245,8 +245,24 @@ public class PostService {
         }
 
         findPost.modifyPost(modifyPostDto);
+
+
+        if(modifyPostDto.getImageUrls() != null) {
+            findPost.getPostImages().clear();
+
+            modifyPostDto.getImageUrls().forEach(url -> {
+                PostImage postImage = PostImage.builder()
+                        .post(findPost)
+                        .imageUrl(url)
+                        .build();
+                findPost.addPostImage(postImage);
+            });
+        }
+
+        postRepository.save(findPost);
     }
 
+    @Transactional(readOnly = true)
     public ModifyPostDto beforePost(Long id) {
 
         Post beforePost = postRepository.findById(id)
@@ -257,13 +273,19 @@ public class PostService {
             throw new CustomException(PostErrorCode.ALREADY_DELETED);
         }
 
+        List<String> imageUrls = beforePost.getPostImages().stream()
+                .map(PostImage::getImageUrl)
+                .toList();
+
+
         return new ModifyPostDto(
                 beforePost.getTitle(),
                 beforePost.getContent(),
                 beforePost.getPostFor(),
                 beforePost.getPostStatus(),
                 beforePost.getPrice(),
-                beforePost.getCategory()
+                beforePost.getCategory(),
+                imageUrls
         );
 
     }
